@@ -17,8 +17,9 @@
 package ivorius.ivtoolkit.tools;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.item.Item;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
@@ -44,7 +45,7 @@ public class MCRegistryDefault implements MCRegistry
     }
 
     @Override
-    public void modifyItemStackCompound(NBTTagCompound compound, ResourceLocation itemID)
+    public void modifyItemStackCompound(CompoundNBT compound, ResourceLocation itemID)
     {
 
     }
@@ -62,8 +63,8 @@ public class MCRegistryDefault implements MCRegistry
     }
 
     @Override
-    public TileEntity loadTileEntity(NBTTagCompound compound)
+    public TileEntity loadTileEntity(BlockState blockState, CompoundNBT compound)
     {
-        return TileEntity.create(compound);
+        return TileEntity.loadStatic(blockState, compound);
     }
 }

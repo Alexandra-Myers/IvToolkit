@@ -19,12 +19,12 @@ package ivorius.ivtoolkit.blocks;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import ivorius.ivtoolkit.tools.MCRegistry;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,14 +37,14 @@ public class IvBlockCollection
     public final int width;
     public final int height;
     public final int length;
-    private final IBlockState[] blockStates;
+    private final BlockState[] blockStates;
 
     public IvBlockCollection(int width, int height, int length)
     {
         this(airArray(width, height, length), width, height, length);
     }
 
-    public IvBlockCollection(IBlockState[] blockStates, int width, int height, int length)
+    public IvBlockCollection(BlockState[] blockStates, int width, int height, int length)
     {
         if (blockStates.length != width * height * length)
             throw new IllegalArgumentException();
@@ -55,13 +55,13 @@ public class IvBlockCollection
         this.length = length;
     }
 
-    public IvBlockCollection(NBTTagCompound compound, MCRegistry registry)
+    public IvBlockCollection(CompoundNBT compound, MCRegistry registry)
     {
         width = compound.getInt("width");
         height = compound.getInt("height");
         length = compound.getInt("length");
 
-        if (compound.hasKey("blocks")) {
+        if (compound.contains("blocks")) {
             // Legacy
 
             IvBlockMapper mapper = new IvBlockMapper(compound, "mapping", registry);
@@ -73,7 +73,7 @@ public class IvBlockCollection
             if (metas.length != width * height * length)
                 throw new RuntimeException("Block collection length is " + metas.length + " but should be " + width + " * " + height + " * " + length);
 
-            blockStates = new IBlockState[width * height * length];
+            blockStates = new BlockState[width * height * length];
             for (int i = 0; i < blockStates.length; i++)
                 blockStates[i] = BlockStates.fromLegacyMetadata(blocks[i], metas[i]);
 
@@ -87,10 +87,10 @@ public class IvBlockCollection
             throw new RuntimeException("Block collection length is " + blockStates.length + " but should be " + width + " * " + height + " * " + length);
     }
 
-    private static IBlockState[] airArray(int width, int height, int length)
+    private static BlockState[] airArray(int width, int height, int length)
     {
-        IBlockState[] blocks = new IBlockState[width * height * length];
-        Arrays.fill(blocks, Blocks.AIR.getDefaultState());
+        BlockState[] blocks = new BlockState[width * height * length];
+        Arrays.fill(blocks, Blocks.AIR.defaultBlockState());
         return blocks;
     }
 
@@ -109,16 +109,16 @@ public class IvBlockCollection
         return length;
     }
 
-    public IBlockState getBlockState(BlockPos coord)
+    public BlockState getBlockState(BlockPos coord)
     {
         if (!hasCoord(coord))
-            return Blocks.AIR.getDefaultState();
+            return Blocks.AIR.defaultBlockState();
 
-        IBlockState block = blockStates[indexFromCoord(coord)];
-        return block != null ? block : Blocks.AIR.getDefaultState();
+        BlockState block = blockStates[indexFromCoord(coord)];
+        return block != null ? block : Blocks.AIR.defaultBlockState();
     }
 
-    public void setBlockState(BlockPos coord, IBlockState state)
+    public void setBlockState(BlockPos coord, BlockState state)
     {
         if (state == null)
             throw new NullPointerException();
@@ -140,12 +140,12 @@ public class IvBlockCollection
         return coord.getX() >= 0 && coord.getX() < width && coord.getY() >= 0 && coord.getY() < height && coord.getZ() >= 0 && coord.getZ() < length;
     }
 
-    public boolean shouldRenderSide(BlockPos coord, EnumFacing side)
+    public boolean shouldRenderSide(BlockPos coord, Direction side)
     {
-        BlockPos sideCoord = coord.add(side.getXOffset(), side.getYOffset(), side.getZOffset());
+        BlockPos sideCoord = coord.offset(side.getStepX(), side.getStepY(), side.getStepZ());
 
-        IBlockState block = getBlockState(sideCoord);
-        return !block.isSideInvisible(block, side);
+        BlockState block = getBlockState(sideCoord);
+        return !block.skipRendering(block, side);
     }
 
 //    public RayTraceResult rayTrace(Vec3d position, Vec3d direction)
@@ -157,7 +157,7 @@ public class IvBlockCollection
 //        {
 //            position = new Vec3d(intersection.getX(), intersection.getY(), intersection.getZ());
 //            BlockPos curCoord = new BlockPos(position.x, position.y, position.z);
-//            EnumFacing hitSide = ((EnumFacing) intersection.getHitInfo()).getOpposite();
+//            Direction hitSide = ((Direction) intersection.getHitInfo()).getOpposite();
 //
 //            while (hasCoord(curCoord))
 //            {
@@ -192,7 +192,7 @@ public class IvBlockCollection
 //        return null;
 //    }
 
-    private EnumFacing getExitSide(Vec3d position, Vec3d direction)
+    private Direction getExitSide(Vector3d position, Vector3d direction)
     {
         double innerX = ((position.x % 1.0) + 1.0) % 1.0;
         double innerY = ((position.y % 1.0) + 1.0) % 1.0;
@@ -203,11 +203,11 @@ public class IvBlockCollection
         double zDist = direction.z > 0.0 ? ((1.0 - innerZ) / direction.z) : (innerZ / -direction.z);
 
         if (xDist < yDist && xDist < zDist)
-            return direction.x > 0.0 ? EnumFacing.EAST : EnumFacing.WEST;
+            return direction.x > 0.0 ? Direction.EAST : Direction.WEST;
         else if (yDist < zDist)
-            return direction.y > 0.0 ? EnumFacing.UP : EnumFacing.DOWN;
+            return direction.y > 0.0 ? Direction.UP : Direction.DOWN;
         else
-            return direction.z > 0.0 ? EnumFacing.SOUTH : EnumFacing.NORTH;
+            return direction.z > 0.0 ? Direction.SOUTH : Direction.NORTH;
     }
 
     public int getBlockMultiplicity()
@@ -215,20 +215,20 @@ public class IvBlockCollection
         return new ImmutableSet.Builder<>().addAll(Arrays.asList(blockStates)).build().size();
     }
 
-    public NBTTagCompound createTagCompound(MCRegistry registry)
+    public CompoundNBT createTagCompound(MCRegistry registry)
     {
-        NBTTagCompound compound = new NBTTagCompound();
+        CompoundNBT compound = new CompoundNBT();
         IvBlockStateMapper mapper = new IvBlockStateMapper(registry);
 
-        compound.setInt("width", width);
-        compound.setInt("height", height);
-        compound.setInt("length", length);
+        compound.putInt("width", width);
+        compound.putInt("height", height);
+        compound.putInt("length", length);
 
-        ArrayList<IBlockState> states = Lists.newArrayList(blockStates);
+        ArrayList<BlockState> states = Lists.newArrayList(blockStates);
 
         mapper.addMapping(states);
-        compound.setTag("mapping", mapper.createTagList());
-        compound.setTag("states", mapper.createNBTForStates(states));
+        compound.put("mapping", mapper.createTagList());
+        compound.put("states", mapper.createNBTForStates(states));
 
         return compound;
     }
@@ -276,6 +276,6 @@ public class IvBlockCollection
 
     public BlockArea area()
     {
-        return new BlockArea(BlockPos.ORIGIN, new BlockPos(width - 1, height - 1, length - 1));
+        return new BlockArea(BlockPos.ZERO, new BlockPos(width - 1, height - 1, length - 1));
     }
 }

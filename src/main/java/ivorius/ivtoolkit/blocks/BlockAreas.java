@@ -17,12 +17,13 @@
 package ivorius.ivtoolkit.blocks;
 
 import ivorius.ivtoolkit.gui.IntegerRange;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MutableBoundingBox;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -31,7 +32,7 @@ import java.util.stream.StreamSupport;
  */
 public class BlockAreas
 {
-    public static int sideLength(BlockArea area, EnumFacing side)
+    public static int sideLength(BlockArea area, Direction side)
     {
         int[] size = area.areaSize();
         switch (side)
@@ -50,7 +51,7 @@ public class BlockAreas
         throw new IllegalArgumentException();
     }
 
-    public static BlockArea side(BlockArea area, EnumFacing side)
+    public static BlockArea side(BlockArea area, Direction side)
     {
         BlockPos lowerCorner = area.getLowerCorner();
         BlockPos higherCorner = area.getHigherCorner();
@@ -75,22 +76,22 @@ public class BlockAreas
     }
 
     @Nullable
-    public static BlockArea shrink(BlockArea area, EnumFacing side, int amount)
+    public static BlockArea shrink(BlockArea area, Direction side, int amount)
     {
         switch (side)
         {
             case UP:
-                return shrink(area, BlockPos.ORIGIN, new BlockPos(0, amount, 0));
+                return shrink(area, BlockPos.ZERO, new BlockPos(0, amount, 0));
             case DOWN:
-                return shrink(area, new BlockPos(0, amount, 0), BlockPos.ORIGIN);
+                return shrink(area, new BlockPos(0, amount, 0), BlockPos.ZERO);
             case NORTH:
-                return shrink(area, new BlockPos(0, 0, amount), BlockPos.ORIGIN);
+                return shrink(area, new BlockPos(0, 0, amount), BlockPos.ZERO);
             case EAST:
-                return shrink(area, BlockPos.ORIGIN, new BlockPos(amount, 0, 0));
+                return shrink(area, BlockPos.ZERO, new BlockPos(amount, 0, 0));
             case SOUTH:
-                return shrink(area, BlockPos.ORIGIN, new BlockPos(0, 0, amount));
+                return shrink(area, BlockPos.ZERO, new BlockPos(0, 0, amount));
             case WEST:
-                return shrink(area, new BlockPos(amount, 0, 0), BlockPos.ORIGIN);
+                return shrink(area, new BlockPos(amount, 0, 0), BlockPos.ZERO);
             default:
                 throw new IllegalArgumentException();
         }
@@ -139,22 +140,22 @@ public class BlockAreas
     }
 
     @Nonnull
-    public static BlockArea expand(BlockArea area, EnumFacing side, int amount)
+    public static BlockArea expand(BlockArea area, Direction side, int amount)
     {
         switch (side)
         {
             case UP:
-                return BlockAreas.expand(area, BlockPos.ORIGIN, new BlockPos(0, amount, 0));
+                return BlockAreas.expand(area, BlockPos.ZERO, new BlockPos(0, amount, 0));
             case DOWN:
-                return BlockAreas.expand(area, new BlockPos(0, amount, 0), BlockPos.ORIGIN);
+                return BlockAreas.expand(area, new BlockPos(0, amount, 0), BlockPos.ZERO);
             case NORTH:
-                return BlockAreas.expand(area, new BlockPos(0, 0, amount), BlockPos.ORIGIN);
+                return BlockAreas.expand(area, new BlockPos(0, 0, amount), BlockPos.ZERO);
             case EAST:
-                return BlockAreas.expand(area, BlockPos.ORIGIN, new BlockPos(amount, 0, 0));
+                return BlockAreas.expand(area, BlockPos.ZERO, new BlockPos(amount, 0, 0));
             case SOUTH:
-                return BlockAreas.expand(area, BlockPos.ORIGIN, new BlockPos(0, 0, amount));
+                return BlockAreas.expand(area, BlockPos.ZERO, new BlockPos(0, 0, amount));
             case WEST:
-                return BlockAreas.expand(area, new BlockPos(amount, 0, 0), BlockPos.ORIGIN);
+                return BlockAreas.expand(area, new BlockPos(amount, 0, 0), BlockPos.ZERO);
             default:
                 throw new IllegalArgumentException();
         }
@@ -162,22 +163,25 @@ public class BlockAreas
 
     public static Iterable<BlockPos> positions(BlockArea area)
     {
-        return BlockPos.getAllInBox(area.getPoint1(), area.getPoint2());
+        return BlockPos.betweenClosed(area.getPoint1(), area.getPoint2());
     }
 
-    public static Iterable<BlockPos.MutableBlockPos> mutablePositions(BlockArea area)
+    public static Iterable<BlockPos.Mutable> mutablePositions(BlockArea area)
     {
-        return BlockPos.getAllInBoxMutable(area.getPoint1(), area.getPoint2());
+        Iterable<BlockPos> blockPosIterable = BlockPos.betweenClosed(area.getPoint1(), area.getPoint2());
+        ArrayList<BlockPos.Mutable> mutables = new ArrayList<>();
+        blockPosIterable.forEach((pos) -> mutables.add(pos.mutable()));
+        return mutables;
     }
 
     public static Stream<BlockPos> streamPositions(BlockArea area)
     {
-        return StreamSupport.stream(BlockPos.getAllInBox(area.getPoint1(), area.getPoint2()).spliterator(), false);
+        return StreamSupport.stream(BlockPos.betweenClosed(area.getPoint1(), area.getPoint2()).spliterator(), false);
     }
 
-    public static Stream<BlockPos.MutableBlockPos> streamMutablePositions(BlockArea area)
+    public static Stream<BlockPos.Mutable> streamMutablePositions(BlockArea area)
     {
-        return StreamSupport.stream(BlockPos.getAllInBoxMutable(area.getPoint1(), area.getPoint2()).spliterator(), false);
+        return StreamSupport.stream(mutablePositions(area).spliterator(), false);
     }
 
     public static MutableBoundingBox toBoundingBox(BlockArea area)

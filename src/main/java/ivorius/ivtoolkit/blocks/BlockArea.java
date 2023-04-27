@@ -92,7 +92,7 @@ public class BlockArea implements Iterable<BlockPos>
 
     public AxisAlignedBB asAxisAlignedBB()
     {
-        return new AxisAlignedBB(getLowerCorner(), getHigherCorner().add(1, 1, 1));
+        return new AxisAlignedBB(getLowerCorner(), getHigherCorner().offset(1, 1, 1));
     }
 
     public Stream<BlockPos> stream()

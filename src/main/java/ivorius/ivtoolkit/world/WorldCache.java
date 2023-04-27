@@ -16,7 +16,7 @@
 
 package ivorius.ivtoolkit.world;
 
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.world.World;
@@ -29,40 +29,40 @@ public class WorldCache
     public final World world;
 
     private MutableBoundingBox boundingBox;
-    private IBlockState[] states;
+    private BlockState[] states;
 
     public WorldCache(World world, MutableBoundingBox boundingBox)
     {
         this.world = world;
         this.boundingBox = boundingBox;
-        states = new IBlockState[boundingBox.getXSize() * boundingBox.getYSize() * boundingBox.getZSize()];
+        states = new BlockState[boundingBox.getXSpan() * boundingBox.getYSpan() * boundingBox.getZSpan()];
     }
 
     protected Integer getIndex(BlockPos pos)
     {
-        if (!boundingBox.isVecInside(pos))
+        if (!boundingBox.isInside(pos))
             return null;
 
-        return ((pos.getX() - boundingBox.minX) * boundingBox.getYSize()
-                + (pos.getY() - boundingBox.minY)) * boundingBox.getZSize()
-                + (pos.getZ() - boundingBox.minZ);
+        return ((pos.getX() - boundingBox.x0) * boundingBox.getYSpan()
+                + (pos.getY() - boundingBox.y0)) * boundingBox.getXSpan()
+                + (pos.getZ() - boundingBox.z0);
     }
 
-    public IBlockState getBlockState(BlockPos pos)
+    public BlockState getBlockState(BlockPos pos)
     {
         Integer index = getIndex(pos);
 
         if (index == null)
             return world.getBlockState(pos);
 
-        IBlockState state = states[index];
+        BlockState state = states[index];
 
         return state != null ? state : (states[index] = world.getBlockState(pos));
     }
 
-    public boolean setBlockState(BlockPos pos, IBlockState state, int flags)
+    public boolean setBlockState(BlockPos pos, BlockState state, int flags)
     {
-        boolean b = world.setBlockState(pos, state, flags);
+        boolean b = world.setBlock(pos, state, flags);
 
         if (b) {
             Integer index = getIndex(pos);

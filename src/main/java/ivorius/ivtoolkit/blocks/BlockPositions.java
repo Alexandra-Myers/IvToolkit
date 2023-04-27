@@ -17,7 +17,7 @@
 package ivorius.ivtoolkit.blocks;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 
@@ -46,24 +46,24 @@ public final class BlockPositions
         return new int[]{pos.getX(), pos.getY(), pos.getZ()};
     }
 
-    public static BlockPos readWithBase(NBTTagCompound compound, String keyBase)
+    public static BlockPos readWithBase(CompoundNBT compound, String keyBase)
     {
         return new BlockPos(compound.getInt(keyBase + "_x"), compound.getInt(keyBase + "_y"), compound.getInt(keyBase + "_z"));
     }
 
-    public static void writeToNBT(String keyBase, BlockPos coord, NBTTagCompound compound)
+    public static void writeToNBT(String keyBase, BlockPos coord, CompoundNBT compound)
     {
         if (coord != null)
         {
-            compound.setInt(keyBase + "_x", coord.getX());
-            compound.setInt(keyBase + "_y", coord.getY());
-            compound.setInt(keyBase + "_z", coord.getZ());
+            compound.putInt(keyBase + "_x", coord.getX());
+            compound.putInt(keyBase + "_y", coord.getY());
+            compound.putInt(keyBase + "_z", coord.getZ());
         }
     }
 
-    public static BlockPos readFromNBT(String keyBase, NBTTagCompound compound)
+    public static BlockPos readFromNBT(String keyBase, CompoundNBT compound)
     {
-        return compound.hasKey(keyBase + "_x") && compound.hasKey(keyBase + "_y") && compound.hasKey(keyBase + "_z")
+        return compound.contains(keyBase + "_x") && compound.contains(keyBase + "_y") && compound.contains(keyBase + "_z")
                 ? new BlockPos(compound.getInt(keyBase + "_x"), compound.getInt(keyBase + "_y"), compound.getInt(keyBase + "_z"))
                 : null;
 
@@ -169,6 +169,6 @@ public final class BlockPositions
     @Deprecated
     public static AxisAlignedBB expandToAABB(BlockPos pos, double x, double y, double z)
     {
-        return new AxisAlignedBB(pos).expand(x, y, z);
+        return new AxisAlignedBB(pos).inflate(x, y, z);
     }
 }

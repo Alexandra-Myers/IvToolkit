@@ -18,7 +18,7 @@ package ivorius.ivtoolkit.tools;
 
 import ivorius.ivtoolkit.api.IvSaveAPI;
 import net.minecraft.entity.Entity;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 
 /**
@@ -26,36 +26,36 @@ import net.minecraft.tileentity.TileEntity;
  */
 public class NBTCompoundObjectsMC
 {
-    public static NBTTagCompound write(Entity entity)
+    public static CompoundNBT write(Entity entity)
     {
         return write(entity, false);
     }
 
-    public static NBTTagCompound write(Entity entity, boolean worldIndependent)
+    public static CompoundNBT write(Entity entity, boolean worldIndependent)
     {
-        NBTTagCompound compound = new NBTTagCompound();
+        CompoundNBT compound = new CompoundNBT();
 
         if (IvSaveAPI.canWriteEntityToTag(entity))
             IvSaveAPI.writeEntityToTag(entity, compound, worldIndependent);
         else
-            entity.writeUnlessPassenger(compound);
+            entity.save(compound);
 
         return compound;
     }
 
-    public static NBTTagCompound write(TileEntity entity)
+    public static CompoundNBT write(TileEntity entity)
     {
         return write(entity, false);
     }
 
-    public static NBTTagCompound write(TileEntity entity, boolean worldIndependent)
+    public static CompoundNBT write(TileEntity entity, boolean worldIndependent)
     {
-        NBTTagCompound compound = new NBTTagCompound();
+        CompoundNBT compound = new CompoundNBT();
 
         if (IvSaveAPI.canWriteTileEntityToTag(entity))
             IvSaveAPI.writeTileEntityToTag(entity, compound, worldIndependent);
         else
-            entity.write(compound);
+            entity.save(compound);
 
         return compound;
     }

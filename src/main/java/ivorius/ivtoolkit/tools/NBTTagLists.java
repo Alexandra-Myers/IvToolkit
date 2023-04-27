@@ -16,12 +16,10 @@
 
 package ivorius.ivtoolkit.tools;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-import net.minecraft.nbt.INBTBase;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagIntArray;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.INBT;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.IntArrayNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraftforge.common.util.Constants;
 
 import java.util.List;
@@ -33,74 +31,74 @@ import java.util.stream.IntStream;
  */
 public class NBTTagLists
 {
-    public static List<INBTBase> nbtBases(NBTTagList nbt)
+    public static List<INBT> nbtBases(ListNBT nbt)
     {
         return IntStream.range(0, nbt.size()).mapToObj(nbt::get).collect(Collectors.toList());
     }
 
-    public static void writeTo(NBTTagCompound compound, String key, List<? extends INBTBase> lists)
+    public static void writeTo(CompoundNBT compound, String key, List<? extends INBT> lists)
     {
-        compound.setTag(key, write(lists));
+        compound.put(key, write(lists));
     }
 
-    public static NBTTagList write(List<? extends INBTBase> lists)
+    public static ListNBT write(List<? extends INBT> lists)
     {
-        NBTTagList list = new NBTTagList();
+        ListNBT list = new ListNBT();
         lists.forEach(list::add);
         return list;
     }
 
-    public static List<NBTTagCompound> compoundsFrom(NBTTagCompound compound, String key)
+    public static List<CompoundNBT> compoundsFrom(CompoundNBT compound, String key)
     {
         return compounds(compound.getList(key, Constants.NBT.TAG_COMPOUND));
     }
 
-    public static List<NBTTagCompound> compounds(final NBTTagList nbt)
+    public static List<CompoundNBT> compounds(final ListNBT nbt)
     {
         return IntStream.range(0, nbt.size()).mapToObj(nbt::getCompound).collect(Collectors.toList());
     }
 
     @Deprecated
-    public static void writeCompoundsTo(NBTTagCompound compound, String key, List<NBTTagCompound> list)
+    public static void writeCompoundsTo(CompoundNBT compound, String key, List<CompoundNBT> list)
     {
-        compound.setTag(key, writeCompounds(list));
+        compound.put(key, writeCompounds(list));
     }
 
     @Deprecated
-    public static NBTTagList writeCompounds(List<NBTTagCompound> list)
+    public static ListNBT writeCompounds(List<CompoundNBT> list)
     {
         return write(list);
     }
 
-    public static List<int[]> intArraysFrom(NBTTagCompound compound, String key)
+    public static List<int[]> intArraysFrom(CompoundNBT compound, String key)
     {
         return intArrays(compound.getList(key, Constants.NBT.TAG_INT_ARRAY));
     }
 
-    public static List<int[]> intArrays(final NBTTagList nbt)
+    public static List<int[]> intArrays(final ListNBT nbt)
     {
         return IntStream.range(0, nbt.size()).mapToObj(nbt::getIntArray).collect(Collectors.toList());
     }
 
-    public static void writeIntArraysTo(NBTTagCompound compound, String key, List<int[]> list)
+    public static void writeIntArraysTo(CompoundNBT compound, String key, List<int[]> list)
     {
-        compound.setTag(key, writeIntArrays(list));
+        compound.put(key, writeIntArrays(list));
     }
 
-    public static NBTTagList writeIntArrays(List<int[]> list)
+    public static ListNBT writeIntArrays(List<int[]> list)
     {
-        NBTTagList tagList = new NBTTagList();
-        list.forEach(array -> tagList.add(new NBTTagIntArray(array)));
+        ListNBT tagList = new ListNBT();
+        list.forEach(array -> tagList.add(new IntArrayNBT(array)));
         return tagList;
     }
 
-    public static List<NBTTagList> listsFrom(NBTTagCompound compound, String key)
+    public static List<ListNBT> listsFrom(CompoundNBT compound, String key)
     {
         return lists(compound.getList(key, Constants.NBT.TAG_LIST));
     }
 
-    public static List<NBTTagList> lists(NBTTagList nbt)
+    public static List<ListNBT> lists(ListNBT nbt)
     {
-        return (List) IntStream.range(0, nbt.size()).mapToObj(i -> nbt.get(i).getId() == Constants.NBT.TAG_LIST ? nbt.get(i) : new NBTTagList()).collect(Collectors.toList());
+        return (List) IntStream.range(0, nbt.size()).mapToObj(i -> nbt.get(i).getId() == Constants.NBT.TAG_LIST ? nbt.get(i) : new ListNBT()).collect(Collectors.toList());
     }
 }

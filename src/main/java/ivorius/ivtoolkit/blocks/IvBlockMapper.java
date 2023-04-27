@@ -18,13 +18,9 @@ package ivorius.ivtoolkit.blocks;
 
 import ivorius.ivtoolkit.tools.IvNBTHelper;
 import ivorius.ivtoolkit.tools.MCRegistry;
-import net.minecraft.block.Block;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.nbt.NBTTagString;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraftforge.common.util.Constants;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,12 +37,12 @@ public class IvBlockMapper
         mapping = new ArrayList<>();
     }
 
-    public IvBlockMapper(NBTTagCompound compound, String key, MCRegistry registry)
+    public IvBlockMapper(CompoundNBT compound, String key, MCRegistry registry)
     {
         this(compound.getList(key, Constants.NBT.TAG_STRING), registry);
     }
 
-    public IvBlockMapper(NBTTagList list, MCRegistry registry)
+    public IvBlockMapper(ListNBT list, MCRegistry registry)
     {
         mapping = new ArrayList<>(list.size());
 
@@ -64,13 +60,13 @@ public class IvBlockMapper
         return mapping.size();
     }
 
-    public String[] createBlocksFromNBT(NBTTagCompound compound)
+    public String[] createBlocksFromNBT(CompoundNBT compound)
     {
         String[] blocks;
 
-        if (compound.hasKey("blocksCompressed"))
+        if (compound.contains("blocksCompressed"))
         {
-            NBTTagCompound compressed = compound.getCompound("blocksCompressed");
+            CompoundNBT compressed = compound.getCompound("blocksCompressed");
             int[] vals = IvNBTHelper.readCompressed("data", compressed);
 
             blocks = new String[vals.length];
@@ -78,7 +74,7 @@ public class IvBlockMapper
             for (int i = 0; i < vals.length; i++)
                 blocks[i] = getBlock(vals[i]);
         }
-        else if (compound.hasKey("blockBytes"))
+        else if (compound.contains("blockBytes"))
         {
             byte[] byteArray = compound.getByteArray("blockBytes");
             blocks = new String[byteArray.length];
@@ -86,7 +82,7 @@ public class IvBlockMapper
             for (int i = 0; i < byteArray.length; i++)
                 blocks[i] = getBlock(byteArray[i]);
         }
-        else if (compound.hasKey("blockInts"))
+        else if (compound.contains("blockInts"))
         {
             int[] intArray = compound.getIntArray("blockInts");
             blocks = new String[intArray.length];

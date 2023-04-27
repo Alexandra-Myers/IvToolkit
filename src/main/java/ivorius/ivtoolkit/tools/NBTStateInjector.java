@@ -19,13 +19,11 @@ package ivorius.ivtoolkit.tools;
 import com.google.common.primitives.Ints;
 import ivorius.ivtoolkit.IvToolkit;
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.Item;
-import net.minecraft.nbt.INBTBase;
-import net.minecraft.nbt.NBTPrimitive;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.INBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -37,7 +35,7 @@ public class NBTStateInjector
 {
     public static final String ID_FIX_TAG_KEY = "SG_ID_FIX_TAG";
 
-    public static void recursivelyInject(INBTBase nbt)
+    public static void recursivelyInject(INBT nbt)
     {
         NBTWalker.walkCompounds(nbt, cmp ->
         {
@@ -46,9 +44,9 @@ public class NBTStateInjector
         });
     }
 
-    public static void inject(NBTTagCompound compound)
+    public static void inject(CompoundNBT compound)
     {
-        NBTTagList list = new NBTTagList();
+        ListNBT list = new ListNBT();
 
         injectTEBlockFixTags(compound, "vanishingTileEntity", list, "BlockID");
         injectTEBlockFixTags(compound, "fenceGateTileEntity", list, "camoBlock");
@@ -57,16 +55,16 @@ public class NBTStateInjector
 
         if (list.size() > 0)
         {
-            compound.setTag(ID_FIX_TAG_KEY, list);
+            compound.put(ID_FIX_TAG_KEY, list);
         }
     }
 
-    private static boolean hasPrimitive(NBTTagCompound compound, String key)
+    private static boolean hasPrimitive(CompoundNBT compound, String key)
     {
-        return compound.hasKey(key) && compound.getTag(key) instanceof NBTPrimitive;
+        return compound.contains(key) && compound.get(key) != null;
     }
 
-    public static void injectTEBlockFixTags(NBTTagCompound compound, String tileEntityID, NBTTagList list, String... keys)
+    public static void injectTEBlockFixTags(CompoundNBT compound, String tileEntityID, ListNBT list, String... keys)
     {
         if (tileEntityID.equals(compound.getString("id")))
         {
@@ -76,17 +74,17 @@ public class NBTStateInjector
         }
     }
 
-    public static void addBlockTag(int blockID, NBTTagList tagList, String tagDest)
+    public static void addBlockTag(int blockID, ListNBT tagList, String tagDest)
     {
-        IBlockState state = Block.getStateById(blockID);
-        if (state != Blocks.AIR.getDefaultState())
+        BlockState state = Block.stateById(blockID);
+        if (state != Blocks.AIR.defaultBlockState())
         {
             String stringID = ForgeRegistries.BLOCKS.getKey(state.getBlock()).toString();
 
-            NBTTagCompound idCompound = new NBTTagCompound();
-            idCompound.setString("type", "block");
-            idCompound.setString("tagDest", tagDest);
-            idCompound.setString("blockID", stringID);
+            CompoundNBT idCompound = new CompoundNBT();
+            idCompound.putString("type", "block");
+            idCompound.putString("tagDest", tagDest);
+            idCompound.putString("blockID", stringID);
 
             tagList.add(idCompound);
         }
@@ -96,33 +94,33 @@ public class NBTStateInjector
         }
     }
 
-    public static void recursivelyApply(INBTBase nbt, MCRegistry registry, boolean remove)
+    public static void recursivelyApply(INBT nbt, MCRegistry registry, boolean remove)
     {
         NBTWalker.walkCompounds(nbt, cmp ->
         {
             apply(cmp, registry);
-            if (remove) cmp.removeTag(ID_FIX_TAG_KEY);
+            if (remove) cmp.remove(ID_FIX_TAG_KEY);
             return true;
         });
     }
 
-    public static void apply(NBTTagCompound compound, MCRegistry registry)
+    public static void apply(CompoundNBT compound, MCRegistry registry)
     {
-        if (compound.hasKey(ID_FIX_TAG_KEY))
+        if (compound.contains(ID_FIX_TAG_KEY))
         {
-            NBTTagList list = compound.getList(ID_FIX_TAG_KEY, Constants.NBT.TAG_COMPOUND);
+            ListNBT list = compound.getList(ID_FIX_TAG_KEY, Constants.NBT.TAG_COMPOUND);
             for (int i = 0; i < list.size(); i++)
                 applyIDFixTag(compound, registry, list.getCompound(i));
         }
 
-        if (compound.hasKey("id") && compound.hasKey("Count") && compound.hasKey("Damage")) // Prooobably an item stack
+        if (compound.contains("id") && compound.contains("Count") && compound.contains("Damage")) // Prooobably an item stack
         {
             if (Ints.tryParse(compound.getString("id")) == null) // If this is null, we have a String ID
                 registry.modifyItemStackCompound(compound, new ResourceLocation(compound.getString("id")));
         }
     }
 
-    public static void applyIDFixTag(NBTTagCompound compound, MCRegistry registry, NBTTagCompound fixTag)
+    public static void applyIDFixTag(CompoundNBT compound, MCRegistry registry, CompoundNBT fixTag)
     {
         String type = fixTag.getString("type");
 
@@ -131,7 +129,7 @@ public class NBTStateInjector
             case "item":
             {
                 // Items now read Strings \o/
-                compound.setString(fixTag.getString("tagDest"), fixTag.getString("itemID"));
+                compound.putString(fixTag.getString("tagDest"), fixTag.getString("itemID"));
 
                 break;
             }
@@ -142,7 +140,7 @@ public class NBTStateInjector
 
                 Block block = registry.blockFromID(blockID);
                 if (block != null)
-                    compound.setInt(dest, Block.getStateId(block.getDefaultState()));
+                    compound.putInt(dest, Block.getId(block.defaultBlockState()));
                 else
                     IvToolkit.logger.warn("Failed to fix block tag from structure with ID '" + fixTag.getString("blockID") + "'");
                 break;

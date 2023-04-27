@@ -17,26 +17,21 @@
 package ivorius.ivtoolkit.blocks;
 
 import com.google.common.collect.ImmutableMap;
-import com.mojang.datafixers.DataFixer;
-import com.mojang.datafixers.DataFixerUpper;
-import com.mojang.datafixers.Dynamic;
+import com.mojang.serialization.Dynamic;
 import ivorius.ivtoolkit.IvToolkit;
 import ivorius.ivtoolkit.tools.MCRegistry;
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.state.IProperty;
-import net.minecraft.state.IStateHolder;
+import net.minecraft.state.Property;
 import net.minecraft.state.StateContainer;
+import net.minecraft.state.StateHolder;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.datafix.DataFixesManager;
 import net.minecraft.util.datafix.fixes.BlockStateFlatteningMap;
 import net.minecraft.util.datafix.fixes.BlockStateFlatternEntities;
-import net.minecraft.util.registry.IRegistry;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nonnull;
 import java.util.Map;
@@ -48,37 +43,37 @@ import java.util.Optional;
 public class BlockStates
 {
     @Nonnull
-    public static IBlockState readBlockState(@Nonnull MCRegistry registry, @Nonnull NBTTagCompound compound)
+    public static BlockState readBlockState(@Nonnull MCRegistry registry, @Nonnull CompoundNBT compound)
     {
         if (!compound.contains("Name", 8)) {
-            return Blocks.AIR.getDefaultState();
+            return Blocks.AIR.defaultBlockState();
         }
         else {
             Block block = registry.blockFromID(new ResourceLocation(compound.getString("Name")));
-            IBlockState iblockstate = block.getDefaultState();
+            BlockState BlockState = block.defaultBlockState();
 
             if (compound.contains("Properties", 10)) {
-                NBTTagCompound propertyCompound = compound.getCompound("Properties");
-                StateContainer<Block, IBlockState> stateContainer = block.getStateContainer();
+                CompoundNBT propertyCompound = compound.getCompound("Properties");
+                StateContainer<Block, BlockState> stateContainer = block.getStateDefinition();
 
-                for (String name : propertyCompound.keySet()) {
-                    IProperty<?> iproperty = stateContainer.getProperty(name);
+                for (String name : propertyCompound.getAllKeys()) {
+                    Property<?> iproperty = stateContainer.getProperty(name);
                     if (iproperty != null) {
-                        iblockstate = setValueHelper(iblockstate, iproperty, name, propertyCompound, compound);
+                        BlockState = setValueHelper(BlockState, iproperty, name, propertyCompound, compound);
                     }
                 }
             }
 
-            return iblockstate;
+            return BlockState;
         }
 
     }
 
-    private static <S extends IStateHolder<S>, T extends Comparable<T>> S setValueHelper(S val, IProperty<T> property, String name, NBTTagCompound propertyCompound, NBTTagCompound p_193590_4_)
+    private static <O, S extends StateHolder<O, S>, T extends Comparable<T>> S setValueHelper(S val, Property<T> property, String name, CompoundNBT propertyCompound, CompoundNBT p_193590_4_)
     {
-        Optional<T> optional = property.parseValue(propertyCompound.getString(name));
+        Optional<T> optional = property.getValue(propertyCompound.getString(name));
         if (optional.isPresent()) {
-            return (S) (val.with(property, (T) (optional.get())));
+            return val.setValue(property, optional.get());
         }
         else {
             IvToolkit.logger.warn("Unable to read property: {} with value: {} for blockstate: {}", name, propertyCompound.getString(name), p_193590_4_.toString());
@@ -87,50 +82,50 @@ public class BlockStates
     }
 
     @Nonnull
-    public static NBTTagCompound writeBlockState(@Nonnull MCRegistry registry, @Nonnull IBlockState state)
+    public static CompoundNBT writeBlockState(@Nonnull MCRegistry registry, @Nonnull BlockState state)
     {
-        NBTTagCompound nbttagcompound = new NBTTagCompound();
+        CompoundNBT CompoundNBT = new CompoundNBT();
 
-        nbttagcompound.setString("Name", registry.idFromBlock(state.getBlock()).toString());
+        CompoundNBT.putString("Name", registry.idFromBlock(state.getBlock()).toString());
 
-        ImmutableMap<IProperty<?>, Comparable<?>> properties = state.getValues();
+        ImmutableMap<Property<?>, Comparable<?>> properties = state.getValues();
         if (!properties.isEmpty()) {
-            NBTTagCompound propertyCompound = new NBTTagCompound();
+            CompoundNBT propertyCompound = new CompoundNBT();
 
-            for (Map.Entry<IProperty<?>, Comparable<?>> entry : properties.entrySet()) {
-                IProperty<?> property = entry.getKey();
+            for (Map.Entry<Property<?>, Comparable<?>> entry : properties.entrySet()) {
+                Property<?> property = entry.getKey();
 
-                propertyCompound.setString(
+                propertyCompound.putString(
                         property.getName(),
-                        ((IProperty) property).getName(entry.getValue())
+                        ((Property) property).getName(entry.getValue())
                 );
             }
 
-            nbttagcompound.setTag("Properties", propertyCompound);
+            CompoundNBT.put("Properties", propertyCompound);
         }
 
-        return nbttagcompound;
+        return CompoundNBT;
     }
 
     @Nonnull
-    public static IBlockState readBlockState(@Nonnull MCRegistry registry, @Nonnull PacketBuffer buf)
+    public static BlockState readBlockState(@Nonnull MCRegistry registry, @Nonnull PacketBuffer buf)
     {
-        NBTTagCompound tag = buf.readCompoundTag();
+        CompoundNBT tag = buf.readNbt();
         return tag != null
                 ? readBlockState(registry, tag)
-                : Blocks.AIR.getDefaultState();
+                : Blocks.AIR.defaultBlockState();
     }
 
-    public static void writeBlockState(@Nonnull MCRegistry registry, @Nonnull PacketBuffer buf, @Nonnull IBlockState state)
+    public static void writeBlockState(@Nonnull MCRegistry registry, @Nonnull PacketBuffer buf, @Nonnull BlockState state)
     {
-        buf.writeCompoundTag(writeBlockState(registry, state));
+        buf.writeNbt(writeBlockState(registry, state));
     }
 
-    public static IBlockState fromLegacyMetadata(String blockID, byte metadata)
+    public static BlockState fromLegacyMetadata(String blockID, byte metadata)
     {
         int legacyBlockID = BlockStateFlatternEntities.getBlockId(blockID);
-        Dynamic<?> dynamicNBT = BlockStateFlatteningMap.getFixedNBTForID((legacyBlockID << 4) + metadata & 15);
-        NBTTagCompound compound = (NBTTagCompound) dynamicNBT.getValue();
+        Dynamic<?> dynamicNBT = BlockStateFlatteningMap.getTag((legacyBlockID << 4) + metadata & 15);
+        CompoundNBT compound = (CompoundNBT) dynamicNBT.getValue();
         return NBTUtil.readBlockState(compound);
     }
 }

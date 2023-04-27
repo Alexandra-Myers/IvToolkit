@@ -18,9 +18,9 @@ package ivorius.ivtoolkit.blocks;
 
 import ivorius.ivtoolkit.tools.IvNBTHelper;
 import ivorius.ivtoolkit.tools.MCRegistry;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.block.BlockState;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraftforge.common.util.Constants;
 
 import java.util.ArrayList;
@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 public class IvBlockStateMapper
 {
     private MCRegistry registry;
-    private List<IBlockState> mapping;
+    private List<BlockState> mapping;
 
     public IvBlockStateMapper(MCRegistry registry)
     {
@@ -41,12 +41,12 @@ public class IvBlockStateMapper
         mapping = new ArrayList<>();
     }
 
-    public IvBlockStateMapper(NBTTagCompound compound, String key, MCRegistry registry)
+    public IvBlockStateMapper(CompoundNBT compound, String key, MCRegistry registry)
     {
         this(compound.getList(key, Constants.NBT.TAG_STRING), registry);
     }
 
-    public IvBlockStateMapper(NBTTagList list, MCRegistry registry)
+    public IvBlockStateMapper(ListNBT list, MCRegistry registry)
     {
         this.registry = registry;
         mapping = new ArrayList<>(list.size());
@@ -55,23 +55,23 @@ public class IvBlockStateMapper
             mapping.add(BlockStates.readBlockState(registry, list.getCompound(i)));
     }
 
-    public void addMapping(IBlockState state)
+    public void addMapping(BlockState state)
     {
         if (!mapping.contains(state))
             mapping.add(state);
     }
 
-    public void addMapping(List<IBlockState> states)
+    public void addMapping(List<BlockState> states)
     {
         states.forEach(this::addMapping);
     }
 
-    public int getMapping(IBlockState state)
+    public int getMapping(BlockState state)
     {
         return mapping.indexOf(state);
     }
 
-    public IBlockState getState(int mapping)
+    public BlockState getState(int mapping)
     {
         return this.mapping.get(mapping);
     }
@@ -81,23 +81,23 @@ public class IvBlockStateMapper
         return mapping.size();
     }
 
-    public NBTTagList createTagList()
+    public ListNBT createTagList()
     {
         return mapping.stream()
                 .map(state -> BlockStates.writeBlockState(registry, state))
-                .collect(Collectors.toCollection(NBTTagList::new));
+                .collect(Collectors.toCollection(ListNBT::new));
     }
 
-    public NBTTagCompound createNBTForStates(List<IBlockState> states)
+    public CompoundNBT createNBTForStates(List<BlockState> states)
     {
-        NBTTagCompound compound = new NBTTagCompound();
+        CompoundNBT compound = new CompoundNBT();
 
         int[] vals = new int[states.size()];
         for (int i = 0; i < states.size(); i++)
             vals[i] = getMapping(states.get(i));
-        NBTTagCompound compressed = new NBTTagCompound();
+        CompoundNBT compressed = new CompoundNBT();
         IvNBTHelper.writeCompressed("data", vals, getMapSize() - 1, compressed);
-        compound.setTag("blocksCompressed", compressed);
+        compound.put("blocksCompressed", compressed);
 
 //        if (getMapSize() <= Byte.MAX_VALUE)
 //        {
@@ -125,16 +125,16 @@ public class IvBlockStateMapper
         return compound;
     }
 
-    public IBlockState[] createStatesFromNBT(NBTTagCompound compound)
+    public BlockState[] createStatesFromNBT(CompoundNBT compound)
     {
-        IBlockState[] blocks;
+        BlockState[] blocks;
 
-        if (compound.hasKey("blocksCompressed"))
+        if (compound.contains("blocksCompressed"))
         {
-            NBTTagCompound compressed = compound.getCompound("blocksCompressed");
+            CompoundNBT compressed = compound.getCompound("blocksCompressed");
             int[] vals = IvNBTHelper.readCompressed("data", compressed);
 
-            blocks = new IBlockState[vals.length];
+            blocks = new BlockState[vals.length];
 
             for (int i = 0; i < vals.length; i++)
                 blocks[i] = getState(vals[i]);
@@ -142,7 +142,7 @@ public class IvBlockStateMapper
 //        else if (compound.hasKey("blockBytes"))
 //        {
 //            byte[] byteArray = compound.getByteArray("blockBytes");
-//            blocks = new IBlockState[byteArray.length];
+//            blocks = new BlockState[byteArray.length];
 //
 //            for (int i = 0; i < byteArray.length; i++)
 //                blocks[i] = getState(byteArray[i]);
@@ -150,7 +150,7 @@ public class IvBlockStateMapper
 //        else if (compound.hasKey("blockInts"))
 //        {
 //            int[] intArray = compound.getIntArray("blockInts");
-//            blocks = new IBlockState[intArray.length];
+//            blocks = new BlockState[intArray.length];
 //
 //            for (int i = 0; i < intArray.length; i++)
 //                blocks[i] = getState(intArray[i]);

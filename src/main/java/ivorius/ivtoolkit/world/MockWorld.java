@@ -18,29 +18,30 @@ package ivorius.ivtoolkit.world;
 
 import ivorius.ivtoolkit.blocks.IvTileEntityHelper;
 import ivorius.ivtoolkit.tools.IvWorldData;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.fluid.IFluidState;
-import net.minecraft.init.Biomes;
-import net.minecraft.init.Fluids;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.fluid.FluidState;
+import net.minecraft.fluid.Fluids;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.DimensionType;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -57,10 +58,10 @@ public interface MockWorld extends IBlockReader
 
     World asWorld();
 
-    boolean setBlockState(@Nonnull BlockPos pos, @Nonnull IBlockState state, int flags);
+    boolean setBlockState(@Nonnull BlockPos pos, @Nonnull BlockState state, int flags);
 
     @Nonnull
-    IBlockState getBlockState(@Nonnull BlockPos pos);
+    BlockState getBlockState(@Nonnull BlockPos pos);
 
     @Nullable
     TileEntity getTileEntity(@Nonnull BlockPos pos);
@@ -75,7 +76,7 @@ public interface MockWorld extends IBlockReader
 
     Random rand();
 
-    default boolean setBlockState(BlockPos coord, IBlockState block)
+    default boolean setBlockState(BlockPos coord, BlockState block)
     {
         return setBlockState(coord, block, 3);
     }
@@ -88,27 +89,21 @@ public interface MockWorld extends IBlockReader
 
     default boolean isAirBlock(BlockPos pos)
     {
-        IBlockState state = getBlockState(pos);
+        BlockState state = getBlockState(pos);
         return state.getBlock().isAir(state, this, pos);
     }
 
     @OnlyIn(Dist.CLIENT)
-    default Biome getBiome(BlockPos pos)
-    {
-        return Biomes.DEFAULT;
-    }
+    Biome getBiome(BlockPos pos);
 
 
-    default int getStrongPower(BlockPos pos, EnumFacing direction)
+    default int getStrongPower(BlockPos pos, Direction direction)
     {
         return 0;
     }
 
     @OnlyIn(Dist.CLIENT)
-    default WorldType getWorldType()
-    {
-        return WorldType.CUSTOMIZED;
-    }
+    DimensionType getWorldType();
 
     class Real implements MockWorld
     {
@@ -126,20 +121,26 @@ public interface MockWorld extends IBlockReader
         }
 
         @Override
-        public boolean setBlockState(@Nonnull BlockPos pos, @Nonnull IBlockState state, int flags)
+        public boolean setBlockState(@Nonnull BlockPos pos, @Nonnull BlockState state, int flags)
         {
-            return world.setBlockState(pos, state, flags);
+            return world.setBlock(pos, state, flags);
+        }
+
+        @Nullable
+        @Override
+        public TileEntity getBlockEntity(BlockPos p_175625_1_) {
+            return world.getBlockEntity(p_175625_1_);
         }
 
         @Nonnull
         @Override
-        public IBlockState getBlockState(@Nonnull BlockPos pos)
+        public BlockState getBlockState(@Nonnull BlockPos pos)
         {
             return world.getBlockState(pos);
         }
 
         @Override
-        public IFluidState getFluidState(BlockPos pos)
+        public FluidState getFluidState(BlockPos pos)
         {
             return world.getFluidState(pos);
         }
@@ -153,44 +154,44 @@ public interface MockWorld extends IBlockReader
         @Override
         public TileEntity getTileEntity(@Nonnull BlockPos pos)
         {
-            return world.getTileEntity(pos);
+            return world.getBlockEntity(pos);
         }
 
         @Override
         public void setTileEntity(@Nonnull BlockPos pos, TileEntity tileEntity)
         {
-            world.setTileEntity(pos, tileEntity);
+            world.setBlockEntity(pos, tileEntity);
         }
 
         @Override
         public List<Entity> getEntities(AxisAlignedBB bounds, @Nullable Predicate<? super Entity> predicate)
         {
-            return world.getEntitiesInAABBexcluding(null, bounds, predicate != null ? predicate::test : null);
+            return world.getEntities((Entity) null, bounds, predicate != null ? predicate::test : null);
         }
 
         @Override
         public boolean addEntity(Entity entity)
         {
-            return world.spawnEntity(entity);
+            return world.addFreshEntity(entity);
         }
 
         @Override
         public boolean removeEntity(Entity entity)
         {
-            world.removeEntity(entity);
+            entity.remove();
             return true;
         }
 
         @Override
         public Random rand()
         {
-            return world.rand;
+            return world.random;
         }
 
         @Override
         public int getCombinedLight(BlockPos pos, int lightValue)
         {
-            return world.getCombinedLight(pos, lightValue);
+            return world.getMaxLocalRawBrightness(pos, lightValue);
         }
 
         @Override
@@ -200,15 +201,15 @@ public interface MockWorld extends IBlockReader
         }
 
         @Override
-        public int getStrongPower(BlockPos pos, EnumFacing direction)
+        public int getStrongPower(BlockPos pos, Direction direction)
         {
-            return world.getStrongPower(pos, direction);
+            return world.getDirectSignal(pos, direction);
         }
 
         @Override
-        public WorldType getWorldType()
+        public DimensionType getWorldType()
         {
-            return world.getWorldType();
+            return world.dimensionType();
         }
     }
 
@@ -223,14 +224,14 @@ public interface MockWorld extends IBlockReader
         }
 
         @Override
-        public boolean setBlockState(@Nonnull BlockPos pos, @Nonnull IBlockState state, int flags)
+        public boolean setBlockState(@Nonnull BlockPos pos, @Nonnull BlockState state, int flags)
         {
             return cache.setBlockState(pos, state, flags);
         }
 
         @Nonnull
         @Override
-        public IBlockState getBlockState(@Nonnull BlockPos pos)
+        public BlockState getBlockState(@Nonnull BlockPos pos)
         {
             return cache.getBlockState(pos);
         }
@@ -246,7 +247,7 @@ public interface MockWorld extends IBlockReader
             this.worldData = worldData;
         }
 
-        public static boolean isAt(@Nonnull BlockPos pos, NBTTagCompound nbt)
+        public static boolean isAt(@Nonnull BlockPos pos, CompoundNBT nbt)
         {
             return pos.getX() == nbt.getInt("x")
                     && pos.getY() == nbt.getInt("y")
@@ -260,32 +261,38 @@ public interface MockWorld extends IBlockReader
         }
 
         @Override
-        public boolean setBlockState(@Nonnull BlockPos pos, @Nonnull IBlockState state, int flags)
+        public boolean setBlockState(@Nonnull BlockPos pos, @Nonnull BlockState state, int flags)
         {
             worldData.blockCollection.setBlockState(pos, state);
 
             return true;
         }
 
+        @Nullable
+        @Override
+        public TileEntity getBlockEntity(BlockPos p_175625_1_) {
+            return null;
+        }
+
         @Nonnull
         @Override
-        public IBlockState getBlockState(@Nonnull BlockPos pos)
+        public BlockState getBlockState(@Nonnull BlockPos pos)
         {
             return worldData.blockCollection.getBlockState(pos);
         }
 
         @Override
-        public IFluidState getFluidState(BlockPos pos)
+        public FluidState getFluidState(BlockPos pos)
         {
-            return Fluids.EMPTY.getDefaultState();
+            return Fluids.EMPTY.defaultFluidState();
         }
 
         @Override
         public TileEntity getTileEntity(@Nonnull BlockPos pos)
         {
-            for (NBTTagCompound nbt : worldData.tileEntities) {
+            for (CompoundNBT nbt : worldData.tileEntities) {
                 if (isAt(pos, nbt))
-                    return TileEntity.create(nbt);
+                    return TileEntity.loadStatic(worldData.blockCollection.getBlockState(pos), nbt);
             }
 
             return null;
@@ -295,21 +302,23 @@ public interface MockWorld extends IBlockReader
         public void setTileEntity(@Nonnull BlockPos pos, TileEntity tileEntity)
         {
             worldData.tileEntities.removeIf(nbt -> isAt(pos, nbt));
-            worldData.tileEntities.add(tileEntity.write(new NBTTagCompound()));
+            worldData.tileEntities.add(tileEntity.save(new CompoundNBT()));
         }
 
-        @Override
         public List<Entity> getEntities(AxisAlignedBB bounds, @Nullable Predicate<? super Entity> predicate)
         {
-            return worldData.entities.stream()
-                    .filter(nbt ->
-                    {
-                        NBTTagList pos = nbt.getList("Pos", 6);
-                        return bounds.contains(new Vec3d(pos.getDouble(0), pos.getDouble(1), pos.getDouble(2)));
-                    })
-                    .map(nbt -> EntityType.create(nbt, IvTileEntityHelper.getAnyWorld()))
-                    .filter(predicate)
-                    .collect(Collectors.toList());
+            List<Optional<Entity>> entities = worldData.entities.stream()
+                .filter(nbt ->
+                {
+                    ListNBT pos = nbt.getList("Pos", 6);
+                    return bounds.contains(new Vector3d(pos.getDouble(0), pos.getDouble(1), pos.getDouble(2)));
+                })
+                .map(nbt -> EntityType.create(nbt, IvTileEntityHelper.getAnyWorld()))
+                .filter((Predicate<? super Optional<Entity>>) predicate)
+                .collect(Collectors.toList());
+            List<Entity> result = new ArrayList<>();
+            entities.forEach((optionalEntity) -> optionalEntity.ifPresent((entity) -> result.add(entity)));
+            return result;
         }
 
         @Override
@@ -318,8 +327,8 @@ public interface MockWorld extends IBlockReader
             // To make sure we don't have doubles
             removeEntity(entity);
 
-            NBTTagCompound compound = new NBTTagCompound();
-            if (!entity.writeUnlessRemoved(compound)) {
+            CompoundNBT compound = new CompoundNBT();
+            if (!entity.save(compound)) {
                 return false;
             }
 
@@ -330,13 +339,23 @@ public interface MockWorld extends IBlockReader
         @Override
         public boolean removeEntity(Entity entity)
         {
-            return worldData.entities.removeIf(nbt -> entity.getUniqueID().equals(nbt.getUniqueId("UUID")));
+            return worldData.entities.removeIf(nbt -> entity.getUUID().equals(nbt.getUUID("UUID")));
         }
 
         @Override
         public Random rand()
         {
             return random;
+        }
+
+        @Override
+        public Biome getBiome(BlockPos pos) {
+            return null;
+        }
+
+        @Override
+        public DimensionType getWorldType() {
+            return null;
         }
     }
 

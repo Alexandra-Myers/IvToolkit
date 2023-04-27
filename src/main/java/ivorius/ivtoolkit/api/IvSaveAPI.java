@@ -17,7 +17,7 @@
 package ivorius.ivtoolkit.api;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 
 import java.lang.reflect.InvocationTargetException;
@@ -30,7 +30,7 @@ public class IvSaveAPI
 {
     private static Method getWriteTileEntityToTag(TileEntity entity) throws NoSuchMethodException
     {
-        return entity.getClass().getDeclaredMethod("writeTileEntityToTag", NBTTagCompound.class, boolean.class);
+        return entity.getClass().getDeclaredMethod("writeTileEntityToTag", CompoundNBT.class, boolean.class);
     }
 
     public static boolean canWriteTileEntityToTag(TileEntity entity)
@@ -46,11 +46,11 @@ public class IvSaveAPI
         }
     }
 
-    public static NBTTagCompound writeTileEntityToTag(TileEntity entity, NBTTagCompound compound, boolean worldIndependent)
+    public static CompoundNBT writeTileEntityToTag(TileEntity entity, CompoundNBT compound, boolean worldIndependent)
     {
         try
         {
-            return (NBTTagCompound) getWriteTileEntityToTag(entity).invoke(entity, compound, worldIndependent);
+            return (CompoundNBT) getWriteTileEntityToTag(entity).invoke(entity, compound, worldIndependent);
         }
         catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e)
         {
@@ -60,7 +60,7 @@ public class IvSaveAPI
 
     private static Method getWriteEntityToTag(Entity entity) throws NoSuchMethodException
     {
-        return entity.getClass().getDeclaredMethod("writeEntityToTag", NBTTagCompound.class, boolean.class);
+        return entity.getClass().getDeclaredMethod("writeEntityToTag", CompoundNBT.class, boolean.class);
     }
 
     public static boolean canWriteEntityToTag(Entity entity)
@@ -76,11 +76,11 @@ public class IvSaveAPI
         }
     }
 
-    public static NBTTagCompound writeEntityToTag(Entity entity, NBTTagCompound compound, boolean worldIndependent)
+    public static CompoundNBT writeEntityToTag(Entity entity, CompoundNBT compound, boolean worldIndependent)
     {
         try
         {
-            return (NBTTagCompound) getWriteEntityToTag(entity).invoke(entity, compound, worldIndependent);
+            return (CompoundNBT) getWriteEntityToTag(entity).invoke(entity, compound, worldIndependent);
         }
         catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e)
         {
