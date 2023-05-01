@@ -17,7 +17,7 @@
 package ivorius.ivtoolkit.math;
 
 import ivorius.ivtoolkit.blocks.Directions;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 
 /**
@@ -139,46 +139,46 @@ public class AxisAlignedTransform2D
         return (direction + rotation + (mirrorApplies ? 2 : 0)) % 4;
     }
 
-    public EnumFacing apply(EnumFacing facing)
+    public Direction apply(Direction facing)
     {
-        if (facing.getAxis() == EnumFacing.Axis.Y)
+        if (facing.getAxis() == Direction.Axis.Y)
             return facing;
 
-        if (mirrorX && facing.getAxis() == EnumFacing.Axis.X)
+        if (mirrorX && facing.getAxis() == Direction.Axis.X)
             facing = facing.getOpposite();
 
-        return Directions.HORIZONTAL[(facing.getHorizontalIndex() + rotation) % Directions.HORIZONTAL.length];
+        return Directions.HORIZONTAL[(facing.get2DDataValue() + rotation) % Directions.HORIZONTAL.length];
     }
 
-    public BlockPos.MutableBlockPos applyOn(BlockPos.MutableBlockPos position, int[] size)
+    public BlockPos.Mutable applyOn(BlockPos.Mutable position, int[] size)
     {
         return applyOn(position, position, size, 1);
     }
 
-    public BlockPos.MutableBlockPos applyOn(BlockPos.MutableBlockPos position, int[] size, int centerCorrection)
+    public BlockPos.Mutable applyOn(BlockPos.Mutable position, int[] size, int centerCorrection)
     {
         return applyOn(position, position, size, centerCorrection);
     }
 
-    public BlockPos.MutableBlockPos applyOn(BlockPos position, BlockPos.MutableBlockPos onPosition, int[] size)
+    public BlockPos.Mutable applyOn(BlockPos position, BlockPos.Mutable onPosition, int[] size)
     {
         return applyOn(position, onPosition, size, 1);
     }
 
-    public BlockPos.MutableBlockPos applyOn(BlockPos position, BlockPos.MutableBlockPos onPosition, int[] size, int centerCorrection)
+    public BlockPos.Mutable applyOn(BlockPos position, BlockPos.Mutable onPosition, int[] size, int centerCorrection)
     {
         int positionX = mirrorX ? size[0] - centerCorrection - position.getX() : position.getX();
 
         switch (rotation)
         {
             case 0:
-                return onPosition.setPos(positionX, position.getY(), position.getZ());
+                return onPosition.set(positionX, position.getY(), position.getZ());
             case 1:
-                return onPosition.setPos(size[2] - centerCorrection - position.getZ(), position.getY(), positionX);
+                return onPosition.set(size[2] - centerCorrection - position.getZ(), position.getY(), positionX);
             case 2:
-                return onPosition.setPos(size[0] - centerCorrection - positionX, position.getY(), size[2] - centerCorrection - position.getZ());
+                return onPosition.set(size[0] - centerCorrection - positionX, position.getY(), size[2] - centerCorrection - position.getZ());
             case 3:
-                return onPosition.setPos(position.getZ(), position.getY(), size[0] - centerCorrection - positionX);
+                return onPosition.set(position.getZ(), position.getY(), size[0] - centerCorrection - positionX);
             default:
                 throw new InternalError();
         }

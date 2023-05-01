@@ -20,9 +20,8 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
 
 /**
  * Created by lukas on 01.07.14.
@@ -32,14 +31,14 @@ public class PacketEntityCapabilityData implements IvPacket
     private int entityID;
     private String context;
     private String capabilityKey;
-    private EnumFacing direction;
+    private Direction direction;
     private ByteBuf payload;
 
     public PacketEntityCapabilityData()
     {
     }
 
-    public PacketEntityCapabilityData(int entityID, String context, String capabilityKey, EnumFacing direction, ByteBuf payload)
+    public PacketEntityCapabilityData(int entityID, String context, String capabilityKey, Direction direction, ByteBuf payload)
     {
         this.entityID = entityID;
         this.context = context;
@@ -48,7 +47,7 @@ public class PacketEntityCapabilityData implements IvPacket
         this.payload = payload;
     }
 
-    public static <T> PacketEntityCapabilityData packetEntityData(Entity entity, String capabilityKey, EnumFacing facing, String context, Object... params)
+    public static <T> PacketEntityCapabilityData packetEntityData(Entity entity, String capabilityKey, Direction facing, String context, Object... params)
     {
         Capability<T> capability = CapabilityUpdateRegistry.INSTANCE.capability(capabilityKey);
         T t = entity.getCapability(capability, facing).orElse(null);
@@ -59,7 +58,7 @@ public class PacketEntityCapabilityData implements IvPacket
         ByteBuf buf = Unpooled.buffer();
         ((PartialUpdateHandler) t).writeUpdateData(buf, context, params);
 
-        return new PacketEntityCapabilityData(entity.getEntityId(), context, capabilityKey, facing, buf);
+        return new PacketEntityCapabilityData(entity.getId(), context, capabilityKey, facing, buf);
     }
 
     public int getEntityID()
@@ -92,12 +91,12 @@ public class PacketEntityCapabilityData implements IvPacket
         this.capabilityKey = capabilityKey;
     }
 
-    public EnumFacing getDirection()
+    public Direction getDirection()
     {
         return direction;
     }
 
-    public void setDirection(EnumFacing direction)
+    public void setDirection(Direction direction)
     {
         this.direction = direction;
     }
@@ -116,10 +115,10 @@ public class PacketEntityCapabilityData implements IvPacket
     public void decode(PacketBuffer buf)
     {
         entityID = buf.readInt();
-        context = buf.readString(1000);
-        capabilityKey = buf.readString(1000);
+        context = buf.readUtf(1000);
+        capabilityKey = buf.readUtf(1000);
         direction = IvPacketHelper.maybeRead(buf, null,
-                () -> direction = EnumFacing.byIndex(buf.readInt()));
+                () -> direction = Direction.from3DDataValue(buf.readInt()));
         payload = IvPacketHelper.readByteBuffer(buf);
     }
 
@@ -127,10 +126,10 @@ public class PacketEntityCapabilityData implements IvPacket
     public void encode(PacketBuffer buf)
     {
         buf.writeInt(entityID);
-        buf.writeString(context);
-        buf.writeString(capabilityKey);
+        buf.writeUtf(context, 1000);
+        buf.writeUtf(capabilityKey, 1000);
         IvPacketHelper.maybeWrite(buf, direction,
-                () -> buf.writeInt(direction.getIndex()));
+                () -> buf.writeInt(direction.get3DDataValue()));
         IvPacketHelper.writeByteBuffer(buf, payload);
     }
 

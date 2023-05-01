@@ -17,7 +17,7 @@
 package ivorius.ivtoolkit.blocks;
 
 import ivorius.ivtoolkit.gui.IntegerRange;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -27,7 +27,7 @@ import javax.annotation.Nullable;
  */
 public class BlockSurfaceAreas
 {
-    public static int sideLength(BlockSurfaceArea area, EnumFacing side)
+    public static int sideLength(BlockSurfaceArea area, Direction side)
     {
         int[] size = area.areaSize();
         switch (side)
@@ -46,7 +46,7 @@ public class BlockSurfaceAreas
         throw new IllegalArgumentException();
     }
 
-    public static BlockSurfaceArea side(BlockSurfaceArea area, EnumFacing side)
+    public static BlockSurfaceArea side(BlockSurfaceArea area, Direction side)
     {
         BlockSurfacePos lowerCorner = area.getLowerCorner();
         BlockSurfacePos higherCorner = area.getHigherCorner();
@@ -67,7 +67,7 @@ public class BlockSurfaceAreas
     }
 
     @Nullable
-    public static BlockSurfaceArea shrink(BlockSurfaceArea area, EnumFacing side, int amount)
+    public static BlockSurfaceArea shrink(BlockSurfaceArea area, Direction side, int amount)
     {
         switch (side)
         {

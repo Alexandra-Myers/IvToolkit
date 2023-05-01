@@ -16,7 +16,7 @@
 
 package ivorius.ivtoolkit.network;
 
-import net.minecraft.inventory.Container;
+import net.minecraft.inventory.container.Container;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 import java.util.function.Supplier;
@@ -35,7 +35,7 @@ public class PacketGuiActionHandler
 
     protected static <T> void handleServer(PacketGuiAction message, NetworkEvent.Context context)
     {
-        Container container = context.getSender().openContainer;
+        Container container = context.getSender().containerMenu;
         
         if (container instanceof PacketGuiAction.ActionHandler) {
             ((PacketGuiAction.ActionHandler) container).handleAction(message.getContext(), message.getPayload());

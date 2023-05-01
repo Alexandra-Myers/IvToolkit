@@ -17,21 +17,19 @@
 package ivorius.ivtoolkit.maze.classic;
 
 import com.google.common.base.Function;
-import net.minecraft.nbt.NBTTagCompound;
-
-import javax.annotation.Nullable;
+import net.minecraft.nbt.CompoundNBT;
 
 /**
  * Created by lukas on 13.04.15.
  */
 public class MazePaths
 {
-    public static Function<MazePath, NBTTagCompound> toNBT()
+    public static Function<MazePath, CompoundNBT> toNBT()
     {
         return input -> input.storeInNBT();
     }
 
-    public static Function<NBTTagCompound, MazePath> fromNBT()
+    public static Function<CompoundNBT, MazePath> fromNBT()
     {
         return input -> new MazePath(input);
     }

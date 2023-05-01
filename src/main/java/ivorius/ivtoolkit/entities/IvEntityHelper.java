@@ -16,37 +16,37 @@
 
 package ivorius.ivtoolkit.entities;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 
 public class IvEntityHelper
 {
-    public static boolean addAsCurrentItem(EntityPlayer player, ItemStack stack)
+    public static boolean addAsCurrentItem(PlayerEntity player, ItemStack stack)
     {
-        return addAsCurrentItem(player.inventory, stack, player.world.isRemote);
+        return addAsCurrentItem(player.inventory, stack, player.level.isClientSide);
     }
 
-    public static boolean addAsCurrentItem(InventoryPlayer inventory, ItemStack stack, boolean isRemote)
+    public static boolean addAsCurrentItem(PlayerInventory inventory, ItemStack stack, boolean isRemote)
     {
         int var6;
 
-        if (inventory.getStackInSlot(inventory.currentItem) != null)
+        if (inventory.getItem(inventory.selected) != ItemStack.EMPTY)
         {
-            var6 = inventory.getFirstEmptyStack();
+            var6 = inventory.getFreeSlot();
         }
         else
         {
-            var6 = inventory.currentItem;
+            var6 = inventory.selected;
         }
 
         if (var6 >= 0 && var6 < 9)
         {
-            inventory.currentItem = var6;
+            inventory.selected = var6;
 
             if (!isRemote)
             {
-                inventory.setInventorySlotContents(inventory.currentItem, stack);
+                inventory.setItem(inventory.selected, stack);
             }
 
             return true;

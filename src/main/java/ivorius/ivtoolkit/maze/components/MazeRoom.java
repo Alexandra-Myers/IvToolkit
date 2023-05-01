@@ -17,7 +17,7 @@
 package ivorius.ivtoolkit.maze.components;
 
 import ivorius.ivtoolkit.math.IvVecMathHelper;
-import net.minecraft.nbt.NBTTagIntArray;
+import net.minecraft.nbt.IntArrayNBT;
 
 import javax.annotation.Nonnull;
 import java.util.Arrays;
@@ -35,9 +35,9 @@ public class MazeRoom
         this.coordinates = coordinates.clone();
     }
 
-    public MazeRoom(NBTTagIntArray intArray)
+    public MazeRoom(IntArrayNBT intArray)
     {
-        coordinates = intArray.getIntArray().clone();
+        coordinates = intArray.getAsIntArray().clone();
     }
 
     public int getDimensions()
@@ -128,8 +128,8 @@ public class MazeRoom
         return Arrays.toString(coordinates);
     }
 
-    public NBTTagIntArray storeInNBT()
+    public IntArrayNBT storeInNBT()
     {
-        return new NBTTagIntArray(coordinates.clone());
+        return new IntArrayNBT(coordinates.clone());
     }
 }

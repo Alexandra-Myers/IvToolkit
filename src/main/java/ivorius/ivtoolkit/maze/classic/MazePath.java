@@ -16,7 +16,7 @@
 
 package ivorius.ivtoolkit.maze.classic;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 
 import javax.annotation.Nonnull;
 
@@ -42,7 +42,7 @@ public class MazePath implements MazeCoordinate
         this(pathDimension, new MazeRoom(roomCoordinates.clone()));
     }
 
-    public MazePath(NBTTagCompound compound)
+    public MazePath(CompoundNBT compound)
     {
         sourceRoom = new MazeRoom(compound.getIntArray("source"));
         pathDimension = compound.getInt("pathDimension");
@@ -136,11 +136,11 @@ public class MazePath implements MazeCoordinate
         return coords;
     }
 
-    public NBTTagCompound storeInNBT()
+    public CompoundNBT storeInNBT()
     {
-        NBTTagCompound compound = new NBTTagCompound();
-        compound.setIntArray("source", sourceRoom.getCoordinates());
-        compound.setInt("pathDimension", pathDimension);
+        CompoundNBT compound = new CompoundNBT();
+        compound.putIntArray("source", sourceRoom.getCoordinates());
+        compound.putInt("pathDimension", pathDimension);
         return compound;
     }
 }

@@ -17,7 +17,7 @@
 package ivorius.ivtoolkit.network;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.ServerPlayerEntity;
 
 /**
  * A interface for some object types that need extra information to be communicated
@@ -39,5 +39,5 @@ public interface ClientEventHandler
      *
      * @param buffer The packet data stream
      */
-    void onClientEvent(ByteBuf buffer, String context, EntityPlayerMP player);
+    void onClientEvent(ByteBuf buffer, String context, ServerPlayerEntity player);
 }

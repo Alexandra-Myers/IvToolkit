@@ -16,7 +16,7 @@
 
 package ivorius.ivtoolkit.blocks;
 
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction ;
 import net.minecraft.util.math.BlockPos;
 
 /**
@@ -24,18 +24,18 @@ import net.minecraft.util.math.BlockPos;
  */
 public class IvMutableBlockPos
 {
-    public static BlockPos.MutableBlockPos add(BlockPos.MutableBlockPos pos, BlockPos add)
+    public static BlockPos.Mutable add(BlockPos.Mutable pos, BlockPos add)
     {
-        return pos.setPos(pos.getX() + add.getX(), pos.getY() + add.getY(), pos.getZ() + add.getZ());
+        return pos.set(pos.getX() + add.getX(), pos.getY() + add.getY(), pos.getZ() + add.getZ());
     }
 
-    public static BlockPos.MutableBlockPos offset(BlockPos pos, BlockPos.MutableBlockPos dest, EnumFacing facing)
+    public static BlockPos.Mutable offset(BlockPos pos, BlockPos.Mutable dest, Direction  facing)
     {
         return offset(pos, dest, facing, 1);
     }
 
-    public static BlockPos.MutableBlockPos offset(BlockPos pos, BlockPos.MutableBlockPos dest, EnumFacing facing, int amount)
+    public static BlockPos.Mutable offset(BlockPos pos, BlockPos.Mutable dest, Direction  facing, int amount)
     {
-        return dest.setPos(pos.getX() + facing.getXOffset() * amount, pos.getY() + facing.getYOffset() * amount, pos.getZ() + facing.getZOffset() * amount);
+        return dest.set(pos.getX() + facing.getStepX() * amount, pos.getY() + facing.getStepY() * amount, pos.getZ() + facing.getStepZ() * amount);
     }
 }

@@ -21,15 +21,18 @@ import io.netty.buffer.Unpooled;
 import ivorius.ivtoolkit.blocks.BlockPositions;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.world.DimensionType;
+import net.minecraft.world.World;
 
 /**
  * Created by lukas on 01.07.14.
  */
 public class PacketTileEntityClientEvent implements IvPacket
 {
-    private DimensionType dimension;
+    private RegistryKey<World> dimension;
     private BlockPos pos;
     private String context;
     private ByteBuf payload;
@@ -38,7 +41,7 @@ public class PacketTileEntityClientEvent implements IvPacket
     {
     }
 
-    public PacketTileEntityClientEvent(DimensionType dimension, BlockPos pos, String context, ByteBuf payload)
+    public PacketTileEntityClientEvent(RegistryKey<World> dimension, BlockPos pos, String context, ByteBuf payload)
     {
         this.dimension = dimension;
         this.pos = pos;
@@ -50,15 +53,15 @@ public class PacketTileEntityClientEvent implements IvPacket
     {
         ByteBuf buf = Unpooled.buffer();
         entity.assembleClientEvent(buf, context, params);
-        return new PacketTileEntityClientEvent(entity.getWorld().getDimension().getType(), entity.getPos(), context, buf);
+        return new PacketTileEntityClientEvent(entity.getLevel().dimension(), entity.getBlockPos(), context, buf);
     }
 
-    public DimensionType getDimension()
+    public RegistryKey<World> getDimension()
     {
         return dimension;
     }
 
-    public void setDimension(DimensionType dimension)
+    public void setDimension(RegistryKey<World> dimension)
     {
         this.dimension = dimension;
     }
@@ -96,18 +99,18 @@ public class PacketTileEntityClientEvent implements IvPacket
     @Override
     public void decode(PacketBuffer buf)
     {
-        dimension = DimensionType.getById(buf.readInt());
+        dimension = RegistryKey.elementKey(Registry.DIMENSION_REGISTRY).apply(buf.readResourceLocation());
         pos = BlockPositions.readFromBuffer(buf);
-        context = buf.readString(1000);
+        context = buf.readUtf(1000);
         payload = IvPacketHelper.readByteBuffer(buf);
     }
 
     @Override
     public void encode(PacketBuffer buf)
     {
-        buf.writeInt(dimension.getId());
+        buf.writeResourceLocation(dimension.location());
         BlockPositions.writeToBuffer(pos, buf);
-        buf.writeString(context);
+        buf.writeUtf(context, 1000);
         IvPacketHelper.writeByteBuffer(buf, payload);
     }
 }

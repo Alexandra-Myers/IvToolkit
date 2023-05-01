@@ -16,12 +16,12 @@
 
 package ivorius.ivtoolkit.gui;
 
-import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.widget.Widget;
 
 /**
  * Created by lukas on 28.05.14.
  */
-public interface GuiControlListener<G extends Gui>
+public interface GuiControlListener<G extends Widget>
 {
     void valueChanged(G gui);
 }

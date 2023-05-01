@@ -17,27 +17,27 @@
 package ivorius.ivtoolkit.blocks;
 
 import ivorius.ivtoolkit.tools.IvSideClient;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.play.server.SPacketUpdateTileEntity;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
 
 public class IvTileEntityHelper
 {
-    public static SPacketUpdateTileEntity getStandardDescriptionPacket(TileEntity tileEntity)
+    public static SUpdateTileEntityPacket getStandardDescriptionPacket(TileEntity tileEntity)
     {
-        NBTTagCompound var1 = new NBTTagCompound();
-        tileEntity.write(var1);
-        return new SPacketUpdateTileEntity(tileEntity.getPos(), 1, var1);
+        CompoundNBT var1 = new CompoundNBT();
+        tileEntity.save(var1);
+        return new SUpdateTileEntityPacket(tileEntity.getBlockPos(), 1, var1);
     }
 
     public static World getAnyWorld()
     {
         return FMLEnvironment.dist.isClient()
                 ? IvSideClient.getClientWorld()
-                : ServerLifecycleHooks.getCurrentServer().getWorld(DimensionType.OVERWORLD);
+                : ServerLifecycleHooks.getCurrentServer().getLevel(World.OVERWORLD);
     }
 }

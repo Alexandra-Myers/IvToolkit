@@ -16,21 +16,21 @@
 
 package ivorius.ivtoolkit.tools;
 
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 
 /**
  * Created by lukas on 22.07.15.
  */
 public class EnumFacingHelper
 {
-    public static EnumFacing byName(String name)
+    public static Direction byName(String name)
     {
         return byName(name, null);
     }
 
-    public static EnumFacing byName(String name, EnumFacing defaultFacing)
+    public static Direction byName(String name, Direction defaultFacing)
     {
-        for (EnumFacing facing : EnumFacing.values())
+        for (Direction facing : Direction.values())
         {
             if (facing.getName().equals(name))
                 return facing;

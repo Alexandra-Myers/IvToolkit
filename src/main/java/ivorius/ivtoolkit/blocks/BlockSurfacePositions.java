@@ -17,7 +17,7 @@
 package ivorius.ivtoolkit.blocks;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 
 import java.util.Collection;
 
@@ -43,23 +43,23 @@ public final class BlockSurfacePositions
         return new int[]{pos.getX(), pos.getZ()};
     }
 
-    public static BlockSurfacePos readWithBase(NBTTagCompound compound, String keyBase)
+    public static BlockSurfacePos readWithBase(CompoundNBT compound, String keyBase)
     {
         return new BlockSurfacePos(compound.getInt(keyBase + "_x"), compound.getInt(keyBase + "_z"));
     }
 
-    public static void writeToNBT(String keyBase, BlockSurfacePos coord, NBTTagCompound compound)
+    public static void writeToNBT(String keyBase, BlockSurfacePos coord, CompoundNBT compound)
     {
         if (coord != null)
         {
-            compound.setInt(keyBase + "_x", coord.getX());
-            compound.setInt(keyBase + "_z", coord.getZ());
+            compound.putInt(keyBase + "_x", coord.getX());
+            compound.putInt(keyBase + "_z", coord.getZ());
         }
     }
 
-    public static BlockSurfacePos readFromNBT(String keyBase, NBTTagCompound compound)
+    public static BlockSurfacePos readFromNBT(String keyBase, CompoundNBT compound)
     {
-        return compound.hasKey(keyBase + "_x") && compound.hasKey(keyBase + "_y") && compound.hasKey(keyBase + "_z")
+        return compound.contains(keyBase + "_x") && compound.contains(keyBase + "_y") && compound.contains(keyBase + "_z")
                 ? new BlockSurfacePos(compound.getInt(keyBase + "_x"), compound.getInt(keyBase + "_z"))
                 : null;
 

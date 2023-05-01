@@ -17,21 +17,19 @@
 package ivorius.ivtoolkit.maze.classic;
 
 import com.google.common.base.Function;
-import net.minecraft.nbt.NBTTagIntArray;
-
-import javax.annotation.Nullable;
+import net.minecraft.nbt.IntArrayNBT;
 
 /**
  * Created by lukas on 13.04.15.
  */
 public class MazeRooms
 {
-    public static Function<MazeRoom, NBTTagIntArray> toNBT()
+    public static Function<MazeRoom, IntArrayNBT> toNBT()
     {
         return input -> input.storeInNBT();
     }
 
-    public static Function<NBTTagIntArray, MazeRoom> fromNBT()
+    public static Function<IntArrayNBT, MazeRoom> fromNBT()
     {
         return input -> new MazeRoom(input);
     }

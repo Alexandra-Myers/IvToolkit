@@ -17,7 +17,7 @@
 package ivorius.ivtoolkit.network;
 
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.WorldServer;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 import java.util.function.Supplier;
@@ -27,9 +27,9 @@ import java.util.function.Supplier;
  */
 public class PacketTileEntityClientEventHandler
 {
-    public static WorldServer getServerWorld(PacketTileEntityClientEvent message, NetworkEvent.Context ctx)
+    public static ServerWorld getServerWorld(PacketTileEntityClientEvent message, NetworkEvent.Context ctx)
     {
-        return ctx.getSender().getServerWorld().getServer().getWorld(message.getDimension());
+        return ctx.getSender().getServer().getLevel(message.getDimension());
     }
 
     public static void handle(PacketTileEntityClientEvent packet, Supplier<NetworkEvent.Context> supplier)
@@ -41,8 +41,8 @@ public class PacketTileEntityClientEventHandler
 
     protected static <T> void handleServer(PacketTileEntityClientEvent message, NetworkEvent.Context context)
     {
-        WorldServer world = getServerWorld(message, context);
-        TileEntity entity = world.getTileEntity(message.getPos());
+        ServerWorld world = getServerWorld(message, context);
+        TileEntity entity = world.getBlockEntity(message.getPos());
 
         if (entity != null)
             ((ClientEventHandler) entity).onClientEvent(message.getPayload(), message.getContext(), context.getSender());

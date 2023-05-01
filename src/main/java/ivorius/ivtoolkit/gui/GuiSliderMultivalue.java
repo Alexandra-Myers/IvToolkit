@@ -16,10 +16,14 @@
 
 package ivorius.ivtoolkit.gui;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraftforge.fml.client.gui.GuiUtils;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -27,7 +31,7 @@ import java.util.List;
 /**
  * Created by lukas on 28.05.14.
  */
-public class GuiSliderMultivalue extends GuiButton
+public class GuiSliderMultivalue extends Button
 {
     private float[] values;
     public int mousePressedInsideIndex = -1;
@@ -35,20 +39,20 @@ public class GuiSliderMultivalue extends GuiButton
     private float minValue = 0.0f;
     private float maxValue = 1.0f;
 
-    public GuiSliderMultivalue(int id, int x, int y, int width, int height, int values, String displayString)
+    public GuiSliderMultivalue(int x, int y, int width, int height, int values, ITextComponent displayString, IPressable handler)
     {
-        super(id, x, y, width, height, displayString);
+        super(x, y, width, height, displayString, handler);
+        this.values = new float[values];
+    }
+
+    public GuiSliderMultivalue(int x, int y, int width, int height, int values, ITextComponent displayString, IPressable handler, ITooltip tooltip)
+    {
+        super(x, y, width, height, displayString, handler, tooltip);
         this.values = new float[values];
     }
 
     @Override
-    public int getHoverState(boolean mouseHovering)
-    {
-        return 0;
-    }
-
-    @Override
-    protected void renderBg(Minecraft mc, int mouseX, int mouseY)
+    protected void renderBg(MatrixStack matrixStack, Minecraft mc, int mouseX, int mouseY)
     {
         if (this.visible)
         {
@@ -70,13 +74,13 @@ public class GuiSliderMultivalue extends GuiButton
                 notifyOfChanges();
             }
 
-            GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+            GlStateManager._color4f(1.0F, 1.0F, 1.0F, 1.0F);
 
             for (float value : values)
             {
                 float drawVal = (value - this.minValue) / (this.maxValue - this.minValue);
-                this.drawTexturedModalRect(this.x + (int) (drawVal * (float) (this.width - 8)), this.y, 0, 66, 4, height);
-                this.drawTexturedModalRect(this.x + (int) (drawVal * (float) (this.width - 8)) + 4, this.y, 196, 66, 4, height);
+                GuiUtils.drawTexturedModalRect(matrixStack, this.x + (int) (drawVal * (float) (this.width - 8)), this.y, 0, 66, 4, height, 0);
+                GuiUtils.drawTexturedModalRect(matrixStack, this.x + (int) (drawVal * (float) (this.width - 8)) + 4, this.y, 196, 66, 4, height, 0);
             }
         }
     }

@@ -6,8 +6,7 @@
 package ivorius.ivtoolkit.network;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.world.WorldServer;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.network.NetworkDirection;
@@ -44,7 +43,7 @@ public class SchedulingMessageHandler
 
     public static void scheduleServer(NetworkEvent.Context context, Runnable runnable)
     {
-        WorldServer world = context.getSender().getServerWorld();
+        ServerWorld world = context.getSender().getLevel();
         world.addScheduledTask(runnable);
     }
 }
