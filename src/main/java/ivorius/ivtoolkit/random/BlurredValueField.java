@@ -18,7 +18,7 @@ package ivorius.ivtoolkit.random;
 
 import ivorius.ivtoolkit.tools.NBTCompoundObject;
 import ivorius.ivtoolkit.tools.NBTCompoundObjects;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -316,13 +316,13 @@ public class BlurredValueField implements NBTCompoundObject, BlurrablePivot
     }
 
     @Override
-    public void readFromNBT(NBTTagCompound compound)
+    public void readFromNBT(CompoundNBT compound)
     {
         size = compound.getIntArray("size");
         offset = compound.getIntArray("offset");
         values.addAll(NBTCompoundObjects.readListFrom(compound, "values", Value.class));
 
-        if (compound.hasKey("chunks"))
+        if (compound.contains("chunks"))
         {
             chunks = NBTCompoundObjects.readListFrom(compound, "chunks", BlurredValueField::new).stream()
                     .toArray(BlurredValueField[]::new);
@@ -334,16 +334,16 @@ public class BlurredValueField implements NBTCompoundObject, BlurrablePivot
     }
 
     @Override
-    public void writeToNBT(NBTTagCompound compound)
+    public void writeToNBT(CompoundNBT compound)
     {
-        compound.setIntArray("size", size);
-        compound.setIntArray("offset", offset);
+        compound.putIntArray("size", size);
+        compound.putIntArray("offset", offset);
         NBTCompoundObjects.writeListTo(compound, "values", values);
 
         if (chunks != null)
         {
             NBTCompoundObjects.writeListTo(compound, "chunks", values);
-            compound.setIntArray("chunkCount", chunkCount);
+            compound.putIntArray("chunkCount", chunkCount);
         }
     }
 
@@ -395,20 +395,20 @@ public class BlurredValueField implements NBTCompoundObject, BlurrablePivot
         }
 
         @Override
-        public void readFromNBT(NBTTagCompound compound)
+        public void readFromNBT(CompoundNBT compound)
         {
             value = compound.getDouble("value");
-            weight = compound.hasKey("weight") ? compound.getDouble("weight") : null;
+            weight = compound.contains("weight") ? compound.getDouble("weight") : null;
             pos = compound.getIntArray("pos");
         }
 
         @Override
-        public void writeToNBT(NBTTagCompound compound)
+        public void writeToNBT(CompoundNBT compound)
         {
-            compound.setDouble("value", value);
+            compound.putDouble("value", value);
             if (weight != null)
-                compound.setDouble("weight", weight);
-            compound.setIntArray("pos", pos);
+                compound.putDouble("weight", weight);
+            compound.putIntArray("pos", pos);
         }
 
         @Override

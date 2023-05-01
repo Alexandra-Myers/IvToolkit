@@ -41,7 +41,7 @@ public class PacketTileEntityDataHandler
     protected static <T> void handleClient(PacketTileEntityData message, NetworkEvent.Context context)
     {
         World world = IvSideClient.getClientWorld();
-        TileEntity entity = world.getTileEntity(message.getPos());
+        TileEntity entity = world.getBlockEntity(message.getPos());
 
         if (entity != null)
             ((PartialUpdateHandler) entity).readUpdateData(message.getPayload(), message.getContext());

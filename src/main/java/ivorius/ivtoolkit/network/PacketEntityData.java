@@ -46,7 +46,7 @@ public class PacketEntityData implements IvPacket
     {
         ByteBuf buf = Unpooled.buffer();
         entity.writeUpdateData(buf, context, params);
-        return new PacketEntityData(entity.getEntityId(), context, buf);
+        return new PacketEntityData(entity.getId(), context, buf);
     }
 
     public int getEntityID()
@@ -83,7 +83,7 @@ public class PacketEntityData implements IvPacket
     public void encode(PacketBuffer buf)
     {
         entityID = buf.readInt();
-        context = buf.readString(1000);
+        context = buf.readUtf(1000);
         payload = IvPacketHelper.readByteBuffer(buf);
     }
 
@@ -91,7 +91,7 @@ public class PacketEntityData implements IvPacket
     public void decode(PacketBuffer buf)
     {
         buf.writeInt(entityID);
-        buf.writeString(context);
+        buf.writeUtf(context, 1000);
         IvPacketHelper.writeByteBuffer(buf, payload);
     }
 

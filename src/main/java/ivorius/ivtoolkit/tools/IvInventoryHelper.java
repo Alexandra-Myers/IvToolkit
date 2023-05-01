@@ -16,13 +16,13 @@
 
 package ivorius.ivtoolkit.tools;
 
-import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
 public class IvInventoryHelper
 {
-    public static boolean consumeInventoryItem(InventoryPlayer inventory, ItemStack itemStack)
+    public static boolean consumeInventoryItem(PlayerInventory inventory, ItemStack itemStack)
     {
         int var2 = getInventorySlotContainItem(inventory, itemStack);
 
@@ -32,17 +32,17 @@ public class IvInventoryHelper
         }
         else
         {
-            inventory.mainInventory.get(var2).setCount(inventory.mainInventory.get(var2).getCount() - 1);
+            inventory.items.get(var2).setCount(inventory.items.get(var2).getCount() - 1);
 
             return true;
         }
     }
 
-    public static int getInventorySlotContainItem(InventoryPlayer inventory, ItemStack itemStack)
+    public static int getInventorySlotContainItem(PlayerInventory inventory, ItemStack itemStack)
     {
-        for (int var2 = 0; var2 < inventory.mainInventory.size(); ++var2)
+        for (int var2 = 0; var2 < inventory.items.size(); ++var2)
         {
-            if (!inventory.mainInventory.get(var2).isEmpty() && inventory.mainInventory.get(var2).isItemEqual(itemStack))
+            if (!inventory.items.get(var2).isEmpty() && inventory.items.get(var2).sameItem(itemStack))
             {
                 return var2;
             }
@@ -51,11 +51,11 @@ public class IvInventoryHelper
         return -1;
     }
 
-    public static int getInventorySlotContainItem(InventoryPlayer inventory, Item item)
+    public static int getInventorySlotContainItem(PlayerInventory inventory, Item item)
     {
-        for (int var2 = 0; var2 < inventory.mainInventory.size(); ++var2)
+        for (int var2 = 0; var2 < inventory.items.size(); ++var2)
         {
-            if (!inventory.mainInventory.get(var2).isEmpty() && inventory.mainInventory.get(var2).getItem() == item)
+            if (!inventory.items.get(var2).isEmpty() && inventory.items.get(var2).getItem() == item)
             {
                 return var2;
             }

@@ -19,7 +19,7 @@ package ivorius.ivtoolkit.rendering.grid;
 import ivorius.ivtoolkit.rendering.Icon;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 
 import java.util.Collection;
 
@@ -28,13 +28,13 @@ import java.util.Collection;
  */
 public class CubeMesh
 {
-    public static void renderSides(Collection<EnumFacing> sides, double x1, double y1, double z1, double x2, double y2, double z2, Icon icon)
+    public static void renderSides(Collection<Direction> sides, double x1, double y1, double z1, double x2, double y2, double z2, Icon icon)
     {
-        for (EnumFacing direction : sides)
+        for (Direction direction : sides)
             renderSide(direction, x1,y1, z1, x2, y2, z2, icon);
     }
 
-    public static void renderSide(EnumFacing side, double x1, double y1, double z1, double x2, double y2, double z2, Icon icon)
+    public static void renderSide(Direction side, double x1, double y1, double z1, double x2, double y2, double z2, Icon icon)
     {
         switch (side)
         {
@@ -63,55 +63,55 @@ public class CubeMesh
 
     public static void renderNorth(double x1, double y1, double x2, double y2, double z, Icon icon)
     {
-        BufferBuilder renderer = Tessellator.getInstance().getBuffer();
-        renderer.pos(x1, y1, z).tex(icon.getMinU(), icon.getMinV()).endVertex();
-        renderer.pos(x1, y2, z).tex(icon.getMaxU(), icon.getMinV()).endVertex();
-        renderer.pos(x2, y2, z).tex(icon.getMaxU(), icon.getMaxV()).endVertex();
-        renderer.pos(x2, y1, z).tex(icon.getMinU(), icon.getMaxV()).endVertex();
+        BufferBuilder renderer = Tessellator.getInstance().getBuilder();
+        renderer.vertex(x1, y1, z).uv(icon.getMinU(), icon.getMinV()).endVertex();
+        renderer.vertex(x1, y2, z).uv(icon.getMaxU(), icon.getMinV()).endVertex();
+        renderer.vertex(x2, y2, z).uv(icon.getMaxU(), icon.getMaxV()).endVertex();
+        renderer.vertex(x2, y1, z).uv(icon.getMinU(), icon.getMaxV()).endVertex();
     }
 
     public static void renderEast(double z1, double y1, double z2, double y2, double x, Icon icon)
     {
-        BufferBuilder renderer = Tessellator.getInstance().getBuffer();
-        renderer.pos(x, y1, z1).tex(icon.getMinU(), icon.getMinV()).endVertex();
-        renderer.pos(x, y2, z1).tex(icon.getMinU(), icon.getMaxV()).endVertex();
-        renderer.pos(x, y2, z2).tex(icon.getMaxU(), icon.getMaxV()).endVertex();
-        renderer.pos(x, y1, z2).tex(icon.getMaxU(), icon.getMinV()).endVertex();
+        BufferBuilder renderer = Tessellator.getInstance().getBuilder();
+        renderer.vertex(x, y1, z1).uv(icon.getMinU(), icon.getMinV()).endVertex();
+        renderer.vertex(x, y2, z1).uv(icon.getMinU(), icon.getMaxV()).endVertex();
+        renderer.vertex(x, y2, z2).uv(icon.getMaxU(), icon.getMaxV()).endVertex();
+        renderer.vertex(x, y1, z2).uv(icon.getMaxU(), icon.getMinV()).endVertex();
     }
 
     public static void renderSouth(double x1, double y1, double x2, double y2, double z, Icon icon)
     {
-        BufferBuilder renderer = Tessellator.getInstance().getBuffer();
-        renderer.pos(x1, y1, z).tex(icon.getMinU(), icon.getMinV()).endVertex();
-        renderer.pos(x2, y1, z).tex(icon.getMinU(), icon.getMaxV()).endVertex();
-        renderer.pos(x2, y2, z).tex(icon.getMaxU(), icon.getMaxV()).endVertex();
-        renderer.pos(x1, y2, z).tex(icon.getMaxU(), icon.getMinV()).endVertex();
+        BufferBuilder renderer = Tessellator.getInstance().getBuilder();
+        renderer.vertex(x1, y1, z).uv(icon.getMinU(), icon.getMinV()).endVertex();
+        renderer.vertex(x2, y1, z).uv(icon.getMinU(), icon.getMaxV()).endVertex();
+        renderer.vertex(x2, y2, z).uv(icon.getMaxU(), icon.getMaxV()).endVertex();
+        renderer.vertex(x1, y2, z).uv(icon.getMaxU(), icon.getMinV()).endVertex();
     }
 
     public static void renderWest(double z1, double y1, double z2, double y2, double x, Icon icon)
     {
-        BufferBuilder renderer = Tessellator.getInstance().getBuffer();
-        renderer.pos(x, y1, z1).tex(icon.getMinU(), icon.getMinV()).endVertex();
-        renderer.pos(x, y1, z2).tex(icon.getMaxU(), icon.getMinV()).endVertex();
-        renderer.pos(x, y2, z2).tex(icon.getMaxU(), icon.getMaxV()).endVertex();
-        renderer.pos(x, y2, z1).tex(icon.getMinU(), icon.getMaxV()).endVertex();
+        BufferBuilder renderer = Tessellator.getInstance().getBuilder();
+        renderer.vertex(x, y1, z1).uv(icon.getMinU(), icon.getMinV()).endVertex();
+        renderer.vertex(x, y1, z2).uv(icon.getMaxU(), icon.getMinV()).endVertex();
+        renderer.vertex(x, y2, z2).uv(icon.getMaxU(), icon.getMaxV()).endVertex();
+        renderer.vertex(x, y2, z1).uv(icon.getMinU(), icon.getMaxV()).endVertex();
     }
 
     public static void renderUp(double x1, double z1, double x2, double z2, double y, Icon icon)
     {
-        BufferBuilder renderer = Tessellator.getInstance().getBuffer();
-        renderer.pos(x1, y, z1).tex(icon.getMinU(), icon.getMinV()).endVertex();
-        renderer.pos(x1, y, z2).tex(icon.getMinU(), icon.getMaxV()).endVertex();
-        renderer.pos(x2, y, z2).tex(icon.getMaxU(), icon.getMaxV()).endVertex();
-        renderer.pos(x2, y, z1).tex(icon.getMaxU(), icon.getMinV()).endVertex();
+        BufferBuilder renderer = Tessellator.getInstance().getBuilder();
+        renderer.vertex(x1, y, z1).uv(icon.getMinU(), icon.getMinV()).endVertex();
+        renderer.vertex(x1, y, z2).uv(icon.getMinU(), icon.getMaxV()).endVertex();
+        renderer.vertex(x2, y, z2).uv(icon.getMaxU(), icon.getMaxV()).endVertex();
+        renderer.vertex(x2, y, z1).uv(icon.getMaxU(), icon.getMinV()).endVertex();
     }
 
     public static void renderDown(double x1, double z1, double x2, double z2, double y, Icon icon)
     {
-        BufferBuilder renderer = Tessellator.getInstance().getBuffer();
-        renderer.pos(x1, y, z1).tex(icon.getMinU(), icon.getMinV()).endVertex();
-        renderer.pos(x2, y, z1).tex(icon.getMaxU(), icon.getMinV()).endVertex();
-        renderer.pos(x2, y, z2).tex(icon.getMaxU(), icon.getMaxV()).endVertex();
-        renderer.pos(x1, y, z2).tex(icon.getMinU(), icon.getMaxV()).endVertex();
+        BufferBuilder renderer = Tessellator.getInstance().getBuilder();
+        renderer.vertex(x1, y, z1).uv(icon.getMinU(), icon.getMinV()).endVertex();
+        renderer.vertex(x2, y, z1).uv(icon.getMaxU(), icon.getMinV()).endVertex();
+        renderer.vertex(x2, y, z2).uv(icon.getMaxU(), icon.getMaxV()).endVertex();
+        renderer.vertex(x1, y, z2).uv(icon.getMinU(), icon.getMaxV()).endVertex();
     }
 }

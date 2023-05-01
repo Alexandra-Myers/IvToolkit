@@ -53,7 +53,7 @@ public class BufferBuilderAccessor
     public static void addTranslation(BufferBuilder renderer, double x, double y, double z)
     {
         try {
-            renderer.setTranslation(getXOffset().getDouble(renderer) + x, getYOffset().getDouble(renderer) + y, getZOffset().getDouble(renderer) + z);
+            renderer.vertex(getXOffset().getDouble(renderer) + x, getYOffset().getDouble(renderer) + y, getZOffset().getDouble(renderer) + z);
         }
         catch (IllegalAccessException e) {
             e.printStackTrace();

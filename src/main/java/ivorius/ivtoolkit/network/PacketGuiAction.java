@@ -72,14 +72,14 @@ public class PacketGuiAction implements IvPacket
     @Override
     public void decode(PacketBuffer buf)
     {
-        context = buf.readString(1000);
+        context = buf.readUtf(1000);
         payload = IvPacketHelper.readByteBuffer(buf);
     }
 
     @Override
     public void encode(PacketBuffer buf)
     {
-        buf.writeString(context);
+        buf.writeUtf(context, 1000);
         IvPacketHelper.writeByteBuffer(buf, payload);
     }
 

@@ -47,7 +47,7 @@ public class PacketTileEntityData implements IvPacket
     {
         ByteBuf buf = Unpooled.buffer();
         entity.writeUpdateData(buf, context, params);
-        return new PacketTileEntityData(entity.getPos(), context, buf);
+        return new PacketTileEntityData(entity.getBlockPos(), context, buf);
     }
 
     public BlockPos getPos()
@@ -84,7 +84,7 @@ public class PacketTileEntityData implements IvPacket
     public void decode(PacketBuffer buf)
     {
         pos = BlockPositions.readFromBuffer(buf);
-        context = buf.readString(1000);
+        context = buf.readUtf(1000);
         payload = IvPacketHelper.readByteBuffer(buf);
     }
 
@@ -92,7 +92,7 @@ public class PacketTileEntityData implements IvPacket
     public void encode(PacketBuffer buf)
     {
         BlockPositions.writeToBuffer(pos, buf);
-        buf.writeString(context);
+        buf.writeUtf(context, 1000);
         IvPacketHelper.writeByteBuffer(buf, payload);
     }
 

@@ -41,7 +41,7 @@ public class PacketEntityDataHandler
     protected static <T> void handleClient(PacketEntityCapabilityData message, NetworkEvent.Context context)
     {
         World world = IvSideClient.getClientWorld();
-        Entity entity = world.getEntityByID(message.getEntityID());
+        Entity entity = world.getEntity(message.getEntityID());
 
         if (entity != null)
             ((PartialUpdateHandler) entity).readUpdateData(message.getPayload(), message.getContext());

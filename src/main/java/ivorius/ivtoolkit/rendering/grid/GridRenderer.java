@@ -21,7 +21,7 @@ import ivorius.ivtoolkit.tools.BufferBuilderAccessor;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import org.lwjgl.opengl.GL11;
 
 /**
@@ -31,28 +31,28 @@ public class GridRenderer
 {
     public static void renderGrid(int lines, float spacing, float lineLength, float lineWidth)
     {
-        Tessellator.getInstance().getBuffer().begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
+        Tessellator.getInstance().getBuilder().begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
 
         for (int x = -lines; x <= lines; x++)
             for (int z = -lines; z <= lines; z++)
-                renderLine(x * spacing, -lineLength * 0.5f, z * spacing, EnumFacing.UP, lineLength, lineWidth);
+                renderLine(x * spacing, -lineLength * 0.5f, z * spacing, Direction.UP, lineLength, lineWidth);
 
         for (int x = -lines; x <= lines; x++)
             for (int y = -lines; y <= lines; y++)
-                renderLine(x * spacing, y * spacing, -lineLength * 0.5f, EnumFacing.SOUTH, lineLength, lineWidth);
+                renderLine(x * spacing, y * spacing, -lineLength * 0.5f, Direction.SOUTH, lineLength, lineWidth);
 
         for (int y = -lines; y <= lines; y++)
             for (int z = -lines; z <= lines; z++)
-                renderLine(-lineLength * 0.5f, y * spacing, z * spacing, EnumFacing.EAST, lineLength, lineWidth);
+                renderLine(-lineLength * 0.5f, y * spacing, z * spacing, Direction.EAST, lineLength, lineWidth);
 
-        Tessellator.getInstance().draw();
+        Tessellator.getInstance().end();
     }
 
-    public static void renderLine(float x, float y, float z, EnumFacing direction, float length, float size)
+    public static void renderLine(float x, float y, float z, Direction direction, float length, float size)
     {
-        float xDir = direction.getXOffset() * length;
-        float yDir = direction.getYOffset() * length;
-        float zDir = direction.getZOffset() * length;
+        float xDir = direction.getStepX() * length;
+        float yDir = direction.getStepY() * length;
+        float zDir = direction.getStepZ() * length;
 
         if (xDir == 0)
             xDir = size;
@@ -69,7 +69,7 @@ public class GridRenderer
         else
             z += zDir * 0.5;
 
-        BufferBuilder renderer = Tessellator.getInstance().getBuffer();
+        BufferBuilder renderer = Tessellator.getInstance().getBuilder();
 
         BufferBuilderAccessor.addTranslation(renderer, x, y, z);
         IvRenderHelper.renderCuboid(renderer, xDir, yDir, zDir, 1f);

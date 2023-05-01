@@ -16,14 +16,14 @@
 
 package ivorius.ivtoolkit.tools;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 
 /**
  * Created by lukas on 30.03.15.
  */
 public interface NBTCompoundObject
 {
-    void readFromNBT(NBTTagCompound compound);
+    void readFromNBT(CompoundNBT compound);
 
-    void writeToNBT(NBTTagCompound compound);
+    void writeToNBT(CompoundNBT compound);
 }

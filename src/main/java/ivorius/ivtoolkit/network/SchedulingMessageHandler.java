@@ -6,6 +6,7 @@
 package ivorius.ivtoolkit.network;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -38,12 +39,12 @@ public class SchedulingMessageHandler
     @OnlyIn(Dist.CLIENT)
     public static void scheduleClient(Runnable runnable)
     {
-        Minecraft.getInstance().addScheduledTask(runnable);
+        Minecraft.getInstance().execute(runnable);
     }
 
     public static void scheduleServer(NetworkEvent.Context context, Runnable runnable)
     {
-        ServerWorld world = context.getSender().getLevel();
-        world.addScheduledTask(runnable);
+        MinecraftServer server = context.getSender().getLevel().getServer();
+        server.execute(runnable);
     }
 }

@@ -29,27 +29,27 @@ public class IvTranslations
 {
     public static boolean has(String key)
     {
-        return I18n.hasKey(key);
+        return I18n.exists(key);
     }
 
     public static String get(String key)
     {
-        return I18n.format(key);
+        return I18n.get(key);
     }
 
     public static String format(String key, Object... args)
     {
-        return I18n.format(key, args);
+        return I18n.get(key, args);
     }
 
     public static List<String> getLines(String key)
     {
-        return splitLines(I18n.format(key));
+        return splitLines(I18n.get(key));
     }
 
     public static List<String> formatLines(String key, Object... args)
     {
-        return splitLines(I18n.format(key, args));
+        return splitLines(I18n.get(key, args));
     }
 
     public static List<String> splitLines(String text)

@@ -17,7 +17,7 @@
 package ivorius.ivtoolkit.tools;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -28,7 +28,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class IvSideClient
 {
     @OnlyIn(Dist.CLIENT)
-    public static EntityPlayer getClientPlayer()
+    public static PlayerEntity getClientPlayer()
     {
         return Minecraft.getInstance().player;
     }
@@ -36,6 +36,6 @@ public class IvSideClient
     @OnlyIn(Dist.CLIENT)
     public static World getClientWorld()
     {
-        return Minecraft.getInstance().world;
+        return Minecraft.getInstance().level;
     }
 }

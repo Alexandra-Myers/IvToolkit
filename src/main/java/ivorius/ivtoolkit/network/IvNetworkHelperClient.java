@@ -32,7 +32,7 @@ public class IvNetworkHelperClient
 
     public static <ETileEntity extends TileEntity & ClientEventHandler> void sendTileEntityEventPacket(ETileEntity tileEntity, String context, SimpleChannel network, Object... params)
     {
-        if (!(tileEntity.getWorld().isRemote))
+        if (!(tileEntity.getLevel().isClientSide))
             throw new UnsupportedOperationException();
 
         network.sendToServer(PacketTileEntityClientEvent.packetEntityData(tileEntity, context, params));

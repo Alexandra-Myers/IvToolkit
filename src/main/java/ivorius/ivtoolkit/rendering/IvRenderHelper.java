@@ -22,34 +22,34 @@ public class IvRenderHelper
 {
     public static void renderCuboid(BufferBuilder tessellator, float sizeX, float sizeY, float sizeZ, float in)
     {
-        tessellator.pos(-sizeX * in, -sizeY * in, -sizeZ).endVertex();
-        tessellator.pos(-sizeX * in, sizeY * in, -sizeZ).endVertex();
-        tessellator.pos(sizeX * in, sizeY * in, -sizeZ).endVertex();
-        tessellator.pos(sizeX * in, -sizeY * in, -sizeZ).endVertex();
+        tessellator.normal(-sizeX * in, -sizeY * in, -sizeZ).endVertex();
+        tessellator.normal(-sizeX * in, sizeY * in, -sizeZ).endVertex();
+        tessellator.normal(sizeX * in, sizeY * in, -sizeZ).endVertex();
+        tessellator.normal(sizeX * in, -sizeY * in, -sizeZ).endVertex();
 
-        tessellator.pos(-sizeX * in, -sizeY * in, sizeZ).endVertex();
-        tessellator.pos(sizeX * in, -sizeY * in, sizeZ).endVertex();
-        tessellator.pos(sizeX * in, sizeY * in, sizeZ).endVertex();
-        tessellator.pos(-sizeX * in, sizeY * in, sizeZ).endVertex();
+        tessellator.normal(-sizeX * in, -sizeY * in, sizeZ).endVertex();
+        tessellator.normal(sizeX * in, -sizeY * in, sizeZ).endVertex();
+        tessellator.normal(sizeX * in, sizeY * in, sizeZ).endVertex();
+        tessellator.normal(-sizeX * in, sizeY * in, sizeZ).endVertex();
 
-        tessellator.pos(-sizeX, -sizeY * in, -sizeZ * in).endVertex();
-        tessellator.pos(-sizeX, -sizeY * in, sizeZ * in).endVertex();
-        tessellator.pos(-sizeX, sizeY * in, sizeZ * in).endVertex();
-        tessellator.pos(-sizeX, sizeY * in, -sizeZ * in).endVertex();
+        tessellator.normal(-sizeX, -sizeY * in, -sizeZ * in).endVertex();
+        tessellator.normal(-sizeX, -sizeY * in, sizeZ * in).endVertex();
+        tessellator.normal(-sizeX, sizeY * in, sizeZ * in).endVertex();
+        tessellator.normal(-sizeX, sizeY * in, -sizeZ * in).endVertex();
 
-        tessellator.pos(sizeX, -sizeY * in, -sizeZ * in).endVertex();
-        tessellator.pos(sizeX, sizeY * in, -sizeZ * in).endVertex();
-        tessellator.pos(sizeX, sizeY * in, sizeZ * in).endVertex();
-        tessellator.pos(sizeX, -sizeY * in, sizeZ * in).endVertex();
+        tessellator.normal(sizeX, -sizeY * in, -sizeZ * in).endVertex();
+        tessellator.normal(sizeX, sizeY * in, -sizeZ * in).endVertex();
+        tessellator.normal(sizeX, sizeY * in, sizeZ * in).endVertex();
+        tessellator.normal(sizeX, -sizeY * in, sizeZ * in).endVertex();
 
-        tessellator.pos(-sizeX * in, sizeY, -sizeZ * in).endVertex();
-        tessellator.pos(-sizeX * in, sizeY, sizeZ * in).endVertex();
-        tessellator.pos(sizeX * in, sizeY, sizeZ * in).endVertex();
-        tessellator.pos(sizeX * in, sizeY, -sizeZ * in).endVertex();
+        tessellator.normal(-sizeX * in, sizeY, -sizeZ * in).endVertex();
+        tessellator.normal(-sizeX * in, sizeY, sizeZ * in).endVertex();
+        tessellator.normal(sizeX * in, sizeY, sizeZ * in).endVertex();
+        tessellator.normal(sizeX * in, sizeY, -sizeZ * in).endVertex();
 
-        tessellator.pos(-sizeX * in, -sizeY, -sizeZ * in).endVertex();
-        tessellator.pos(sizeX * in, -sizeY, -sizeZ * in).endVertex();
-        tessellator.pos(sizeX * in, -sizeY, sizeZ * in).endVertex();
-        tessellator.pos(-sizeX * in, -sizeY, sizeZ * in).endVertex();
+        tessellator.normal(-sizeX * in, -sizeY, -sizeZ * in).endVertex();
+        tessellator.normal(sizeX * in, -sizeY, -sizeZ * in).endVertex();
+        tessellator.normal(sizeX * in, -sizeY, sizeZ * in).endVertex();
+        tessellator.normal(-sizeX * in, -sizeY, sizeZ * in).endVertex();
     }
 }

@@ -16,14 +16,16 @@
 
 package ivorius.ivtoolkit.gui;
 
+import net.minecraft.util.text.ITextComponent;
+
 /**
  * Created by lukas on 12.06.14.
  */
 public class GuiSliderRange extends GuiSliderMultivalue
 {
-    public GuiSliderRange(int id, int x, int y, int width, int height, String displayString)
+    public GuiSliderRange(int x, int y, int width, int height, ITextComponent displayString, IPressable handler)
     {
-        super(id, x, y, width, height, 2, displayString);
+        super(x, y, width, height, 2, displayString, handler);
     }
 
     public void setRange(FloatRange range)

@@ -42,7 +42,7 @@ public class PacketEntityCapabilityDataHandler
     protected static <T> void handleClient(PacketEntityCapabilityData message, NetworkEvent.Context context)
     {
         World world = IvSideClient.getClientWorld();
-        Entity entity = world.getEntityByID(message.getEntityID());
+        Entity entity = world.getEntity(message.getEntityID());
 
         if (entity != null) {
             Capability<T> capability = CapabilityUpdateRegistry.INSTANCE.capability(message.getCapabilityKey());

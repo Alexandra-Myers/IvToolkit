@@ -51,7 +51,7 @@ public class BlockSurfaceArea implements Iterable<BlockSurfacePos>
 
     public static BlockSurfaceArea from(MutableBoundingBox boundingBox)
     {
-        return new BlockSurfaceArea(new BlockSurfacePos(boundingBox.minX, boundingBox.minZ), new BlockSurfacePos(boundingBox.maxX, boundingBox.maxZ));
+        return new BlockSurfaceArea(new BlockSurfacePos(boundingBox.x0, boundingBox.z0), new BlockSurfacePos(boundingBox.x1, boundingBox.z1));
     }
 
     public BlockSurfacePos getPoint1()

@@ -16,9 +16,9 @@
 
 package ivorius.ivtoolkit.tools;
 
-import net.minecraft.nbt.INBTBase;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.nbt.INBT;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 
 public class NBTCompoundObjectCapabilityStorage<T extends NBTCompoundObject> implements Capability.IStorage<T>
@@ -31,14 +31,14 @@ public class NBTCompoundObjectCapabilityStorage<T extends NBTCompoundObject> imp
     }
 
     @Override
-    public INBTBase writeNBT(Capability<T> capability, T instance, EnumFacing side)
+    public INBT writeNBT(Capability<T> capability, T instance, Direction side)
     {
         return NBTCompoundObjects.write(instance);
     }
 
     @Override
-    public void readNBT(Capability<T> capability, T instance, EnumFacing side, INBTBase nbt)
+    public void readNBT(Capability<T> capability, T instance, Direction side, INBT nbt)
     {
-        instance.readFromNBT(nbt instanceof NBTTagCompound ? (NBTTagCompound) nbt : new NBTTagCompound());
+        instance.readFromNBT(nbt instanceof CompoundNBT ? (CompoundNBT) nbt : new CompoundNBT());
     }
 }

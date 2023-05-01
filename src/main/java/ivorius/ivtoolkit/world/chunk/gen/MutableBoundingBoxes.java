@@ -19,7 +19,7 @@ package ivorius.ivtoolkit.world.chunk.gen;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MutableBoundingBox;
-import net.minecraft.world.WorldServer;
+import net.minecraft.world.server.ServerWorld;
 
 import javax.annotation.Nonnull;
 import java.util.Collections;
@@ -35,11 +35,11 @@ public class MutableBoundingBoxes
     {
         if (boundingBox != null)
         {
-            int minX = boundingBox.minX >> 4;
-            int maxX = boundingBox.maxX >> 4;
+            int minX = boundingBox.x0 >> 4;
+            int maxX = boundingBox.x1 >> 4;
 
-            int minZ = boundingBox.minZ >> 4;
-            int maxZ = boundingBox.maxZ >> 4;
+            int minZ = boundingBox.z0 >> 4;
+            int maxZ = boundingBox.z1 >> 4;
 
             Set<ChunkPos> pairs = new HashSet<>((maxX - minX + 1) * (maxZ - minZ + 1));
             for (int x = minX; x <= maxX; x++)
@@ -54,32 +54,32 @@ public class MutableBoundingBoxes
 
     public static boolean fitsY(MutableBoundingBox boundingBox, int minY, int maxY)
     {
-        return boundingBox.minY >= minY && boundingBox.maxY < maxY;
+        return boundingBox.y0 >= minY && boundingBox.y1 < maxY;
     }
 
     @Nonnull
-    public static MutableBoundingBox wholeHeightBoundingBox(WorldServer world, MutableBoundingBox generationBB)
+    public static MutableBoundingBox wholeHeightBoundingBox(ServerWorld world, MutableBoundingBox generationBB)
     {
         MutableBoundingBox toFloorBB = new MutableBoundingBox(generationBB);
-        toFloorBB.minY = 1;
-        toFloorBB.maxY = world.getHeight();
+        toFloorBB.y0 = 1;
+        toFloorBB.y1 = world.getHeight();
         return toFloorBB;
     }
 
     @Nonnull
     public static BlockPos min(MutableBoundingBox boundingBox)
     {
-        return new BlockPos(boundingBox.minX, boundingBox.minY, boundingBox.minZ);
+        return new BlockPos(boundingBox.x0, boundingBox.y0, boundingBox.z0);
     }
 
     @Nonnull
     public static BlockPos max(MutableBoundingBox boundingBox)
     {
-        return new BlockPos(boundingBox.maxX, boundingBox.maxY, boundingBox.maxZ);
+        return new BlockPos(boundingBox.x1, boundingBox.y1, boundingBox.z1);
     }
 
     public static int[] size(MutableBoundingBox boundingBox)
     {
-        return new int[]{boundingBox.getXSize(), boundingBox.getYSize(), boundingBox.getZSize()};
+        return new int[]{boundingBox.getXSpan(), boundingBox.getYSpan(), boundingBox.getZSpan()};
     }
 }

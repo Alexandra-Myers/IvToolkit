@@ -16,6 +16,7 @@
 
 package ivorius.ivtoolkit.tools;
 
+import cpw.mods.modlauncher.api.INameMappingService;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 import java.lang.reflect.Field;
@@ -25,7 +26,7 @@ public class IvReflection
     public static Field findField(Class<?> clazz, String srg)
     {
         try {
-            String remapped = ObfuscationReflectionHelper.remapName(srg);
+            String remapped = ObfuscationReflectionHelper.remapName(INameMappingService.Domain.FIELD, srg);
 
             Field f = clazz.getDeclaredField(remapped);
             f.setAccessible(true);

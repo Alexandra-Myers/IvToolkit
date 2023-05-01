@@ -19,8 +19,8 @@ package ivorius.ivtoolkit.tools;
 import com.google.common.collect.ImmutableMap;
 import ivorius.ivtoolkit.IvToolkit;
 import ivorius.ivtoolkit.lang.IvClasses;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraftforge.common.util.Constants;
 
 import java.util.ArrayList;
@@ -35,47 +35,47 @@ import java.util.function.Supplier;
 public class NBTCompoundObjects
 {
     @Deprecated
-    public static <T extends NBTCompoundObject> Function<NBTTagCompound, T> readFunction(final Class<T> tClass)
+    public static <T extends NBTCompoundObject> Function<CompoundNBT, T> readFunction(final Class<T> tClass)
     {
         return input -> read(input, tClass);
     }
 
     @Deprecated
-    public static Function<? extends NBTCompoundObject, NBTTagCompound> writeFunction()
+    public static Function<? extends NBTCompoundObject, CompoundNBT> writeFunction()
     {
-        return (Function<NBTCompoundObject, NBTTagCompound>) NBTCompoundObjects::write;
+        return (Function<NBTCompoundObject, CompoundNBT>) NBTCompoundObjects::write;
     }
 
-    public static void writeTo(NBTTagCompound compound, String key, NBTCompoundObject compoundObject)
+    public static void writeTo(CompoundNBT compound, String key, NBTCompoundObject compoundObject)
     {
-        compound.setTag(key, NBTCompoundObjects.write(compoundObject));
+        compound.put(key, NBTCompoundObjects.write(compoundObject));
     }
 
-    public static NBTTagCompound write(NBTCompoundObject compoundObject)
+    public static CompoundNBT write(NBTCompoundObject compoundObject)
     {
-        NBTTagCompound compound = new NBTTagCompound();
+        CompoundNBT compound = new CompoundNBT();
         compoundObject.writeToNBT(compound);
         return compound;
     }
 
     @Deprecated
-    public static <T extends NBTCompoundObject> T readFrom(NBTTagCompound compound, String key, Class<? extends T> keyClass)
+    public static <T extends NBTCompoundObject> T readFrom(CompoundNBT compound, String key, Class<? extends T> keyClass)
     {
         return readFrom(compound, key, classSupplier(keyClass));
     }
 
-    public static <T extends NBTCompoundObject> T readFrom(NBTTagCompound compound, String key, Supplier<? extends T> instantiator)
+    public static <T extends NBTCompoundObject> T readFrom(CompoundNBT compound, String key, Supplier<? extends T> instantiator)
     {
         return NBTCompoundObjects.read(compound.getCompound(key), instantiator);
     }
 
     @Deprecated
-    public static <T extends NBTCompoundObject> T read(NBTTagCompound compound, Class<T> tClass)
+    public static <T extends NBTCompoundObject> T read(CompoundNBT compound, Class<T> tClass)
     {
         return read(compound, classSupplier(tClass));
     }
 
-    public static <T extends NBTCompoundObject> T read(NBTTagCompound compound, Supplier<? extends T> instantiator)
+    public static <T extends NBTCompoundObject> T read(CompoundNBT compound, Supplier<? extends T> instantiator)
     {
         T t = instantiator.get();
         if (t != null)
@@ -83,41 +83,41 @@ public class NBTCompoundObjects
         return t;
     }
 
-    public static void writeListTo(NBTTagCompound compound, String key, Iterable<? extends NBTCompoundObject> objects)
+    public static void writeListTo(CompoundNBT compound, String key, Iterable<? extends NBTCompoundObject> objects)
     {
-        compound.setTag(key, writeList(objects));
+        compound.put(key, writeList(objects));
     }
 
-    public static NBTTagList writeList(Iterable<? extends NBTCompoundObject> objects)
+    public static ListNBT writeList(Iterable<? extends NBTCompoundObject> objects)
     {
-        NBTTagList tagList = new NBTTagList();
+        ListNBT tagList = new ListNBT();
         for (NBTCompoundObject object : objects)
         {
-            NBTTagCompound compound = new NBTTagCompound();
+            CompoundNBT compound = new CompoundNBT();
             object.writeToNBT(compound);
             tagList.add(compound);
         }
         return tagList;
     }
 
-    public static <T extends NBTCompoundObject> List<T> readListFrom(NBTTagCompound compound, String key, Supplier<? extends T> instantiator)
+    public static <T extends NBTCompoundObject> List<T> readListFrom(CompoundNBT compound, String key, Supplier<? extends T> instantiator)
     {
         return readList(compound.getList(key, Constants.NBT.TAG_COMPOUND), instantiator);
     }
 
     @Deprecated
-    public static <T extends NBTCompoundObject> List<T> readListFrom(NBTTagCompound compound, String key, Class<T> tClass)
+    public static <T extends NBTCompoundObject> List<T> readListFrom(CompoundNBT compound, String key, Class<T> tClass)
     {
         return readList(compound.getList(key, Constants.NBT.TAG_COMPOUND), tClass);
     }
 
     @Deprecated
-    public static <T extends NBTCompoundObject> List<T> readList(NBTTagList list, Class<T> tClass)
+    public static <T extends NBTCompoundObject> List<T> readList(ListNBT list, Class<T> tClass)
     {
         return readList(list, classSupplier(tClass));
     }
 
-    public static <T extends NBTCompoundObject> List<T> readList(NBTTagList list, Supplier<? extends T> instantiator)
+    public static <T extends NBTCompoundObject> List<T> readList(ListNBT list, Supplier<? extends T> instantiator)
     {
         List<T> rList = new ArrayList<>(list.size());
 
@@ -128,44 +128,44 @@ public class NBTCompoundObjects
     }
 
     @Deprecated
-    public static <K extends NBTCompoundObject, V extends NBTCompoundObject> Map<K, V> readMapFrom(NBTTagCompound compound, String key, Class<? extends K> keyClass, Class<? extends V> valueClass)
+    public static <K extends NBTCompoundObject, V extends NBTCompoundObject> Map<K, V> readMapFrom(CompoundNBT compound, String key, Class<? extends K> keyClass, Class<? extends V> valueClass)
     {
         return readMapFrom(compound, key, classSupplier(keyClass), classSupplier(valueClass));
     }
 
-    public static <K extends NBTCompoundObject, V extends NBTCompoundObject> Map<K, V> readMapFrom(NBTTagCompound compound, String key, Supplier<? extends K> keySupplier, Supplier<? extends V> valueSupplier)
+    public static <K extends NBTCompoundObject, V extends NBTCompoundObject> Map<K, V> readMapFrom(CompoundNBT compound, String key, Supplier<? extends K> keySupplier, Supplier<? extends V> valueSupplier)
     {
         return readMap(compound.getList(key, Constants.NBT.TAG_COMPOUND), keySupplier, valueSupplier);
     }
 
     @Deprecated
-    public static <K extends NBTCompoundObject, V extends NBTCompoundObject> Map<K, V> readMap(NBTTagList nbt, Class<? extends K> keyClass, Class<? extends V> valueClass)
+    public static <K extends NBTCompoundObject, V extends NBTCompoundObject> Map<K, V> readMap(ListNBT nbt, Class<? extends K> keyClass, Class<? extends V> valueClass)
     {
         return readMap(nbt, classSupplier(keyClass), classSupplier(valueClass));
     }
 
-    public static <K extends NBTCompoundObject, V extends NBTCompoundObject> Map<K, V> readMap(NBTTagList nbt, Supplier<? extends K> keyInstantiator, Supplier<? extends V> valueInstantiator)
+    public static <K extends NBTCompoundObject, V extends NBTCompoundObject> Map<K, V> readMap(ListNBT nbt, Supplier<? extends K> keyInstantiator, Supplier<? extends V> valueInstantiator)
     {
         ImmutableMap.Builder<K, V> map = new ImmutableMap.Builder<>();
         for (int i = 0; i < nbt.size(); i++)
         {
-            NBTTagCompound compound = nbt.getCompound(i);
+            CompoundNBT compound = nbt.getCompound(i);
             map.put(readFrom(compound, "key", keyInstantiator), readFrom(compound, "value", valueInstantiator));
         }
         return map.build();
     }
 
-    public static <K extends NBTCompoundObject, V extends NBTCompoundObject> void writeMapTo(NBTTagCompound compound, String key, Map<K, V> map)
+    public static <K extends NBTCompoundObject, V extends NBTCompoundObject> void writeMapTo(CompoundNBT compound, String key, Map<K, V> map)
     {
-        compound.setTag(key, writeMap(map));
+        compound.put(key, writeMap(map));
     }
 
-    public static <K extends NBTCompoundObject, V extends NBTCompoundObject> NBTTagList writeMap(Map<K, V> map)
+    public static <K extends NBTCompoundObject, V extends NBTCompoundObject> ListNBT writeMap(Map<K, V> map)
     {
-        NBTTagList nbt = new NBTTagList();
+        ListNBT nbt = new ListNBT();
         for (Map.Entry<K, V> entry : map.entrySet())
         {
-            NBTTagCompound compound = new NBTTagCompound();
+            CompoundNBT compound = new CompoundNBT();
             writeTo(compound, "key", entry.getKey());
             writeTo(compound, "value", entry.getValue());
             nbt.add(compound);

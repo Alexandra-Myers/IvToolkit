@@ -19,14 +19,12 @@ package ivorius.ivtoolkit.transform;
 import ivorius.ivtoolkit.blocks.Directions;
 import ivorius.ivtoolkit.math.AxisAlignedTransform2D;
 import ivorius.ivtoolkit.math.MinecraftTransforms;
-import ivorius.ivtoolkit.tools.EntityCreatureAccessor;
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityCreature;
-import net.minecraft.state.IProperty;
+import net.minecraft.state.Property;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
@@ -34,6 +32,8 @@ import net.minecraft.world.World;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.stream.Collectors;
 
 /**
  * Created by lukas on 09.05.16.
@@ -49,7 +49,7 @@ public class PosTransformer
             Pair<Rotation, Mirror> mct = MinecraftTransforms.to(transform);
             tileEntity.mirror(mct.getRight());
             tileEntity.rotate(mct.getLeft());
-            Mover.setTileEntityPos(tileEntity, transform.apply(tileEntity.getPos(), size));
+            Mover.setTileEntityPos(tileEntity, transform.apply(tileEntity.getBlockPos(), size));
         }
     }
 
@@ -59,23 +59,18 @@ public class PosTransformer
             ((AreaTransformable) entity).transform(transform.getRotation(), transform.isMirrorX(), size);
         else
         {
-            double[] newEntityPos = transform.applyOn(new double[]{entity.posX, entity.posY, entity.posZ}, size);
+            BlockPos.Mutable newEntityPos = transform.applyOn(entity.blockPosition().mutable(), size);
 
             Pair<Rotation, Mirror> mct = MinecraftTransforms.to(transform);
-            float yaw = entity.getMirroredYaw(mct.getRight());
-            yaw = yaw + (entity.rotationYaw - entity.getRotatedYaw(mct.getLeft()));
+            float yaw = entity.mirror(mct.getRight());
+            yaw = yaw + (entity.yRot - entity.rotate(mct.getLeft()));
 
-            entity.setLocationAndAngles(newEntityPos[0], newEntityPos[1], newEntityPos[2], yaw, entity.rotationPitch);
-
-            if (entity instanceof EntityCreature)
-            {
-                EntityCreature entityCreature = (EntityCreature) entity;
-                EntityCreatureAccessor.setHomePosition(entityCreature, transform.apply(entityCreature.getHomePosition(), size));
-            }
+            entity.setPos(newEntityPos.getX(), newEntityPos.getY(), newEntityPos.getZ());
+            entity.setYBodyRot(yaw);
         }
     }
 
-    public static IBlockState transformBlockState(IBlockState state, AxisAlignedTransform2D transform)
+    public static BlockState transformBlockState(BlockState state, AxisAlignedTransform2D transform)
     {
         return MinecraftTransforms.map(transform, (rotation, mirror) -> state.mirror(mirror).rotate(rotation));
     }
@@ -86,26 +81,26 @@ public class PosTransformer
     }
 
     @Deprecated
-    public static void transformBlock(AxisAlignedTransform2D transform, World world, IBlockState state, BlockPos coord, Block block)
+    public static void transformBlock(AxisAlignedTransform2D transform, World world, BlockState state, BlockPos coord, Block block)
     {
         transformBlockDefault(transform, world, state, coord, block);
     }
 
     @Deprecated
-    public static void transformBlockDefault(AxisAlignedTransform2D transform, World world, IBlockState state, BlockPos coord, Block block)
+    public static void transformBlockDefault(AxisAlignedTransform2D transform, World world, BlockState state, BlockPos coord, Block block)
     {
-        IBlockState newState = state;
+        BlockState newState = state;
 
-        for (IProperty<?> property : state.getProperties())
+        for (Property<?> property : state.getProperties())
         {
-            if (property.getValueClass() == EnumFacing.class && property.getAllowedValues().containsAll(Arrays.asList(Directions.HORIZONTAL)))
+            if (property.getValueClass() == Direction.class && new HashSet<>(property.getAllValues().collect(Collectors.toList())).containsAll(Arrays.asList(Directions.HORIZONTAL)))
             {
-                EnumFacing value = (EnumFacing) state.get(property);
-                newState = newState.with((IProperty) property, transform.apply(value));
+                Direction value = (Direction) state.getValue(property);
+                newState = newState.setValue((Property) property, transform.apply(value));
             }
         }
 
-        if (newState != state)
-            world.setBlockState(coord, newState);
+        if (newState != state && !world.isClientSide)
+            world.setBlockAndUpdate(coord, newState);
     }
 }

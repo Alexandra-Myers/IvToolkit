@@ -18,8 +18,11 @@ package ivorius.ivtoolkit.tools;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.RegistryKey;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
 import org.apache.logging.log4j.Logger;
@@ -113,20 +116,20 @@ public abstract class IvFMLIntercommHandler
         return Optional.empty();
     }
 
-    protected Entity getEntity(NBTTagCompound compound, boolean server)
+    protected Entity getEntity(CompoundNBT compound, boolean server)
     {
         return getEntity(compound, "worldID", "entityID", server);
     }
 
-    protected Entity getEntity(NBTTagCompound compound, String worldKey, String entityKey, boolean server)
+    protected Entity getEntity(CompoundNBT compound, String worldKey, String entityKey, boolean server)
     {
         if (!server) {
-            return Minecraft.getInstance().world.getEntityByID(compound.getInt(entityKey));
+            return Minecraft.getInstance().level.getEntity(compound.getInt(entityKey));
         }
         else {
-            DimensionType worldID = DimensionType.getById(compound.getInt(worldKey));
+            RegistryKey<World> worldID = RegistryKey.elementKey(Registry.DIMENSION_REGISTRY).apply(ResourceLocation.tryParse(compound.getString(worldKey)));
 
-            return ServerLifecycleHooks.getCurrentServer().getWorld(worldID).getEntityByID(compound.getInt(entityKey));
+            return ServerLifecycleHooks.getCurrentServer().getLevel(worldID).getEntity(compound.getInt(entityKey));
         }
     }
 
